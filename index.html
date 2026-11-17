@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>יחידה 1 — מילון פסיכומטרי קמפוס IL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #0A092D;
+            color: #F6F7FB;
+            font-family: 'Heebo', sans-serif;
+            overflow-x: hidden;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 230px;
+            max-height: 280px;
+        }
+        .fade-slide {
+            animation: fadeSlide 0.22s ease-out forwards;
+        }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A092D;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2E3856;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<!-- Chosen Palette: Quizlet Midnight Indigo (#0A092D background, #13113C elevated surface, #2E3856 border & inactive track, #18AE79 emerald mastery accent, #4255FF royal indigo action, #FF725B coral error highlight) -->
+<!-- Application Structure Plan: Focused Quizlet-style Learn Mode SPA for Unit 1 of the Campus IL Psychometric Dictionary (all 184 entries). Designed to mirror the exact visual layout and spaced-repetition round mechanics requested: (1) Minimalist top bar with Overview/Dictionary drawer toggle (✕), dynamic Round indicator (סיבוב 1, סיבוב 2...), and Settings modal trigger (⚙); (2) 4-segment Quizlet mastery progress bar with floating emerald counter badge and total count pill; (3) Clean question stage displaying the niqqud-vocalized Hebrew word on the right and 4 stacked full-width answer cards below; (4) Instant pedagogical reveal displaying all numbered meanings for polysemous words and automatically re-queuing missed words into subsequent rounds until full mastery; (5) Unit 1 Overview & Analytics modal featuring a Chart.js Canvas progress breakdown and searchable full glossary. -->
+<!-- Visualization & Content Choices: All 184 Unit 1 entries from HEB_DIC_CAMPUS.pdf -> Goal: Active recall mastery of single and multi-meaning Hebrew words -> Viz: Quizlet 4-option active recall cards + segmented progress bar + Chart.js Canvas mastery donut/bar chart in overview modal -> Interaction: Click or keyboard 1-4 selection, instant multi-meaning reveal, spaced repetition rounds, round size & filter settings -> Library: Vanilla JS + Tailwind CSS + Chart.js Canvas. Confirming NO SVG and NO Mermaid JS. -->
+<body class="min-h-screen flex flex-col justify-between selection:bg-[#4255FF] selection:text-white">
+
+    <div class="w-full max-w-xl mx-auto px-4 pt-4 pb-6 flex-grow flex flex-col justify-between">
+
+        <div>
+            <header class="flex items-center justify-between py-2">
+                <button id="open-overview-btn" title="סקירת יחידה 1 ומילון מלא" class="w-11 h-11 rounded-full border border-[#2E3856] bg-[#13113C] hover:bg-[#1E1C52] hover:border-[#4255FF] text-white flex items-center justify-center text-lg font-bold transition-all">
+                    ✕
+                </button>
+
+                <div class="text-center">
+                    <div id="round-title" class="text-base sm:text-lg font-bold text-white tracking-wide">
+                        יחידה 1 • סיבוב 1
+                    </div>
+                    <div id="filter-subtitle" class="text-[11px] text-slate-400">
+                        כל מילות היחידה (184)
+                    </div>
+                </div>
+
+                <button id="open-settings-btn" title="הגדרות תרגול" class="w-11 h-11 rounded-full border border-[#2E3856] bg-[#13113C] hover:bg-[#1E1C52] hover:border-[#4255FF] text-white flex items-center justify-center text-xl transition-all">
+                    ⚙
+                </button>
+            </header>
+
+            <div class="mt-4 mb-6">
+                <div class="relative flex items-center gap-2">
+                    <div class="flex-1 grid grid-cols-4 gap-2 items-center">
+                        <div class="h-2.5 rounded-full bg-[#2E3856] overflow-hidden">
+                            <div id="seg-0" class="h-full bg-[#18AE79] transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="h-2.5 rounded-full bg-[#2E3856] overflow-hidden">
+                            <div id="seg-1" class="h-full bg-[#18AE79] transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="h-2.5 rounded-full bg-[#2E3856] overflow-hidden">
+                            <div id="seg-2" class="h-full bg-[#18AE79] transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <div class="h-2.5 rounded-full bg-[#2E3856] overflow-hidden">
+                            <div id="seg-3" class="h-full bg-[#18AE79] transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div id="mastered-pill" class="bg-[#18AE79] text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-md min-w-[36px] text-center transition-all">
+                        0
+                    </div>
+
+                    <div id="total-pill" class="bg-[#2E3856] text-slate-200 font-bold text-xs px-3 py-1 rounded-full min-w-[42px] text-center">
+                        184
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <main id="question-stage" class="flex-grow flex flex-col justify-between fade-slide">
+            <div class="my-auto py-8 sm:py-12 px-1">
+                <div class="flex items-center gap-2 mb-2">
+                    <span id="question-direction-badge" class="text-xs font-semibold text-slate-400">
+                        מילה מתוך יחידה 1
+                    </span>
+                    <span id="polysemy-hint-badge" class="hidden text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30">
+                        רב-משמעי
+                    </span>
+                </div>
+                <h1 id="term-display" class="text-3xl sm:text-4xl font-bold text-white leading-relaxed tracking-normal text-right">
+                    צִדֵּד
+                </h1>
+            </div>
+
+            <div class="mt-4">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-sm font-bold text-slate-300">בחר את התשובה הנכונה</span>
+                    <span id="round-counter-text" class="text-xs text-slate-400">שאלה 1 מתוך 10</span>
+                </div>
+
+                <div id="options-list" class="space-y-3">
+                </div>
+
+                <div id="feedback-panel" class="hidden mt-4 rounded-2xl border border-[#2E3856] bg-[#13113C] p-4 fade-slide">
+                    <div class="flex items-center justify-between mb-2">
+                        <span id="feedback-status-title" class="text-sm font-extrabold text-[#18AE79]">
+                            נכון מאוד!
+                        </span>
+                        <span id="feedback-word-tag" class="text-xs font-bold text-slate-400">
+                        </span>
+                    </div>
+
+                    <div id="all-meanings-box" class="text-xs sm:text-sm text-slate-200 space-y-1.5 border-t border-[#2E3856] pt-2.5 mt-2">
+                    </div>
+
+                    <button id="next-question-btn" class="mt-4 w-full py-3.5 rounded-xl bg-[#4255FF] hover:bg-[#5667FF] text-white font-bold text-base shadow-lg transition-all flex items-center justify-center gap-2">
+                        <span>המשך לשאלה הבאה</span>
+                        <span>⬅</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <section id="round-summary-stage" class="hidden my-auto py-6 fade-slide">
+            <div class="rounded-2xl border border-[#2E3856] bg-[#13113C] p-6 sm:p-8 text-center shadow-xl">
+                <div class="w-16 h-16 rounded-full bg-[#18AE79]/20 border border-[#18AE79] text-[#18AE79] flex items-center justify-center text-3xl mx-auto mb-4 font-bold">
+                    ✓
+                </div>
+                <h2 id="summary-heading" class="text-2xl font-extrabold text-white mb-2">
+                    סיימת את סיבוב 1!
+                </h2>
+                <p id="summary-subtext" class="text-sm text-slate-300 mb-6">
+                    המשך כך! כל מילה שאתה עונה עליה נכון מקדמת אותך לשליטה מלאה ביחידה 1.
+                </p>
+
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <div class="rounded-xl bg-[#0A092D] border border-[#2E3856] p-3">
+                        <div class="text-xs text-slate-400 mb-1">נכונות בסיבוב</div>
+                        <div id="sum-round-correct" class="text-xl font-extrabold text-[#18AE79]">0</div>
+                    </div>
+                    <div class="rounded-xl bg-[#0A092D] border border-[#2E3856] p-3">
+                        <div class="text-xs text-slate-400 mb-1">לחזרה בסיבוב הבא</div>
+                        <div id="sum-round-missed" class="text-xl font-extrabold text-[#FF725B]">0</div>
+                    </div>
+                    <div class="rounded-xl bg-[#0A092D] border border-[#2E3856] p-3">
+                        <div class="text-xs text-slate-400 mb-1">שליטה ביחידה 1</div>
+                        <div id="sum-total-mastered" class="text-xl font-extrabold text-white">0 / 184</div>
+                    </div>
+                </div>
+
+                <div id="missed-words-preview" class="hidden text-right mb-6 rounded-xl bg-[#0A092D] border border-[#2E3856] p-4 max-h-48 overflow-y-auto">
+                    <div class="text-xs font-bold text-[#FF725B] mb-2">מילים שיופיעו שוב לחיזוק בסיבוב הבא:</div>
+                    <div id="missed-words-list" class="space-y-2 text-xs text-slate-300"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <button id="continue-next-round-btn" class="w-full py-3.5 rounded-xl bg-[#4255FF] hover:bg-[#5667FF] text-white font-bold text-base shadow-lg transition-all">
+                        המשך לסיבוב הבא ⬅
+                    </button>
+                    <button id="restart-unit-btn" class="w-full py-3 rounded-xl border border-[#2E3856] bg-[#0A092D] hover:bg-[#1E1C52] text-slate-200 font-semibold text-sm transition-all">
+                        התחל את יחידה 1 מחדש 🔄
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-md rounded-2xl border border-[#2E3856] bg-[#13113C] p-6 shadow-2xl fade-slide">
+            <div class="flex items-center justify-between border-b border-[#2E3856] pb-3 mb-4">
+                <h3 class="text-lg font-bold text-white">הגדרות תרגול — יחידה 1</h3>
+                <button id="close-settings-btn" class="w-8 h-8 rounded-full bg-[#0A092D] border border-[#2E3856] text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold">
+                    ✕
+                </button>
+            </div>
+
+            <div class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">כמות מילים בכל סיבוב (Round)</label>
+                    <select id="setting-round-size" class="w-full rounded-xl bg-[#0A092D] border border-[#2E3856] text-white px-3.5 py-2.5 focus:outline-none focus:border-[#4255FF]">
+                        <option value="10" selected>10 מילים בסיבוב (מומלץ ללמידה מהירה)</option>
+                        <option value="20">20 מילים בסיבוב</option>
+                        <option value="30">30 מילים בסיבוב</option>
+                        <option value="184">כל 184 המילים ברצף</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">סינון מילים ביחידה 1</label>
+                    <select id="setting-word-filter" class="w-full rounded-xl bg-[#0A092D] border border-[#2E3856] text-white px-3.5 py-2.5 focus:outline-none focus:border-[#4255FF]">
+                        <option value="all" selected>כל המילים ביחידה 1 (184 ערכים)</option>
+                        <option value="poly">מילים רב-משמעיות בלבד (2+ פירושים)</option>
+                        <option value="single">מילים בעלות פירוש יחיד בלבד</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">כיוון השאלה</label>
+                    <select id="setting-direction" class="w-full rounded-xl bg-[#0A092D] border border-[#2E3856] text-white px-3.5 py-2.5 focus:outline-none focus:border-[#4255FF]">
+                        <option value="term-to-def" selected>מילה בעברית ➔ בחירת הפירוש (כמו ב-Quizlet)</option>
+                        <option value="def-to-term">פירוש ➔ בחירת המילה בעברית</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-xs font-semibold text-slate-300">הצג תגית "רב-משמעי" ליד המילה</span>
+                    <input id="setting-show-poly-hint" type="checkbox" checked class="w-5 h-5 accent-[#4255FF] rounded cursor-pointer">
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-[#2E3856] flex gap-3">
+                <button id="apply-settings-btn" class="flex-1 py-3 rounded-xl bg-[#4255FF] hover:bg-[#5667FF] text-white font-bold text-sm transition-all">
+                    שמור והחל הגדרות
+                </button>
+                <button id="reset-progress-settings-btn" class="px-4 py-3 rounded-xl border border-[#FF725B]/50 text-[#FF725B] hover:bg-[#FF725B]/10 font-bold text-xs transition-all">
+                    אפס התקדמות
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="overview-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl max-h-[90vh] rounded-2xl border border-[#2E3856] bg-[#13113C] p-5 sm:p-6 shadow-2xl flex flex-col fade-slide">
+            <div class="flex items-center justify-between border-b border-[#2E3856] pb-3 mb-4 shrink-0">
+                <div>
+                    <h3 class="text-lg font-extrabold text-white">יחידה 1 — מילון מלא ומעקב שליטה</h3>
+                    <p class="text-xs text-slate-400">כולל כל 184 הערכים מתוך קובץ קמפוס IL</p>
+                </div>
+                <button id="close-overview-btn" class="w-9 h-9 rounded-full bg-[#0A092D] border border-[#2E3856] text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold">
+                    ✕
+                </button>
+            </div>
+
+            <div class="overflow-y-auto space-y-5 pr-1 flex-grow">
+                <div class="rounded-xl bg-[#0A092D] border border-[#2E3856] p-4">
+                    <div class="text-xs font-bold text-slate-300 mb-2 text-center">התפלגות שליטה במילות יחידה 1</div>
+                    <div class="chart-container">
+                        <canvas id="unit1-chart"></canvas>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex flex-col sm:flex-row gap-2 mb-3">
+                        <input id="glossary-search-input" type="text" placeholder="חיפוש מילה או פירוש ביחידה 1..." class="flex-1 rounded-xl bg-[#0A092D] border border-[#2E3856] text-white text-sm px-3.5 py-2 focus:outline-none focus:border-[#4255FF]">
+                        <select id="glossary-type-filter" class="rounded-xl bg-[#0A092D] border border-[#2E3856] text-white text-xs px-3 py-2 focus:outline-none focus:border-[#4255FF]">
+                            <option value="all">הכול (184)</option>
+                            <option value="poly">רב-משמעיות בלבד</option>
+                            <option value="mastered">מילים שנלמדו ✓</option>
+                            <option value="unmastered">טרם נלמדו</option>
+                        </select>
+                    </div>
+
+                    <div id="glossary-items-container" class="space-y-2 max-h-72 overflow-y-auto">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-[#2E3856] shrink-0">
+                <button id="resume-study-btn" class="w-full py-3 rounded-xl bg-[#4255FF] hover:bg-[#5667FF] text-white font-bold text-sm transition-all">
+                    חזרה לתרגול ביחידה 1 ⬅
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const unit1Words = [
+            { id: 1, term: "אָבְנַיִים", meanings: ["מתקן מסתובב להכנת כלי חרס"] },
+            { id: 2, term: "אוֹצֵר", meanings: ["שומר על משהו יקר ערך", "הממונה על המוצגים במוזיאון"] },
+            { id: 3, term: "אָחוּ", meanings: ["כר דשא, שדה מרעה"] },
+            { id: 4, term: "אִיחוּי", meanings: ["חיבור חלקים, הכלבה"] },
+            { id: 5, term: "אִילוּלֵא", meanings: ["אם לא, אלמלא, לולי, לולא"] },
+            { id: 6, term: "אֲלוּמָּה", meanings: ["חבילת שיבולים קצורות", "גלים המשודרים בטווח צר, קרן (אלומת אור - קרן אור)"] },
+            { id: 7, term: "אֲלוּמַּת אוֹר", meanings: ["קרן אור"] },
+            { id: 8, term: "אָמוֹדַאי", meanings: ["צוללן"] },
+            { id: 9, term: "אָמִיר", meanings: ["צמרת, הענפים העליונים בעץ"] },
+            { id: 10, term: "אֲמַתְלָה", meanings: ["תירוץ, סיבה לא אמיתית"] },
+            { id: 11, term: "אָסָם", meanings: ["מחסן תבואה"] },
+            { id: 12, term: "אֶצְבָּעוֹן", meanings: ["כיסוי המהווה הגנה לאצבע בשעת תפירה"] },
+            { id: 13, term: "אֶקְרָן", meanings: ["מסך, מִרְקע"] },
+            { id: 14, term: "אָרִיג", meanings: ["בד"] },
+            { id: 15, term: "אַרְכִיב / אַרְכִיּוֹן", meanings: ["מקום אחסון למסמכים"] },
+            { id: 16, term: "אֲרָעִי", meanings: ["זמני"] },
+            { id: 17, term: "אֶשְׁכּוֹל", meanings: ["מספר פירות או פרחים המחוברים יחדיו לאותו הגבעול", "מספר דברים קטנים המחוברים יחד, חבילה"] },
+            { id: 18, term: "בֵּאוּר", meanings: ["הסבר של נושא לא מובן או ההסבר עצמו, פרשנות"] },
+            { id: 19, term: "בְּגִילּוּפִין", meanings: ["במצב של שכרות קלה, \"בראש טוב\""] },
+            { id: 20, term: "בְּגַפּוֹ", meanings: ["לבדו, ללא בן זוג"] },
+            { id: 21, term: "בּוּרְסְקִי / בּוּרְסְקַאי / בּוּרְסִי", meanings: ["מעבד עורות"] },
+            { id: 22, term: "בּוֹשׁ", meanings: ["התבייש"] },
+            { id: 23, term: "בּוֹשֵׁשׁ", meanings: ["התמהמה בעשיית דבר מה (בושש לבוא - איחר, התעכב)"] },
+            { id: 24, term: "בִּיּוּת", meanings: ["אילוף, הפיכת דבר פראי לביתי", "הנחיית פצצה או טיל אל עבר מטרה"] },
+            { id: 25, term: "בֵּרֵא", meanings: ["כָּרַת, עקר עצים"] },
+            { id: 26, term: "בֵּית בַּד", meanings: ["מקום בו מייצרים שמן מזיתים"] },
+            { id: 27, term: "בֵּית מַרְזֵחַ", meanings: ["בר, פאב, מסבאה"] },
+            { id: 28, term: "בַּלָּן", meanings: ["עובד בבית המרחץ"] },
+            { id: 29, term: "בְּמַפְגִּיעַ", meanings: ["בהתרסה, באופן בוטה", "באופן נמרץ, באסרטיביות, בהחלטיות, בפסקנות"] },
+            { id: 30, term: "בַּעֲלִיל", meanings: ["באופן ברור, ללא ספק"] },
+            { id: 31, term: "בְּפוּמְבִּי / בְּפוּמְבֵּי", meanings: ["באופן גלוי ולעיני כל"] },
+            { id: 32, term: "בָּצִיר", meanings: ["קטיף ענבים"] },
+            { id: 33, term: "בָּצַר", meanings: ["קטף ענבים"] },
+            { id: 34, term: "גָּדָה", meanings: ["שפת הנהר, חוף", "קצה כלי, שפת הכלי (מלא עד גדותיו - מלא עד הסוף, עלה על מידותיו)"] },
+            { id: 35, term: "גָּהַר", meanings: ["התכופף, השתופף"] },
+            { id: 36, term: "גּוּר", meanings: ["הִזָּהֵר"] },
+            { id: 37, term: "גְּזוּזְטְרָה", meanings: ["מרפסת חיצונית (ללא גג)"] },
+            { id: 38, term: "גְּזִיר", meanings: ["חתיכה שנגזרה ממשהו"] },
+            { id: 39, term: "גִּלְעֵן", meanings: ["הוציא את גלעין הפרי"] },
+            { id: 40, term: "גַּרְגְּרָן", meanings: ["אכלן, זללן, להוט אחר אוכל"] },
+            { id: 41, term: "גַּת", meanings: ["מקום המשמש לדריכת ענבים והכנת יין"] },
+            { id: 42, term: "דָּגָה", meanings: ["שם כולל לכל הדגים למיניהם"] },
+            { id: 43, term: "דּוֹבֵב", meanings: ["גרם למישהו אחר לדבר"] },
+            { id: 44, term: "דִּידַקְטִי", meanings: ["שקשור בתחום תורת ההוראה (דידקטיקה - תורת ההוראה)"] },
+            { id: 45, term: "דִּרְבּוּן", meanings: ["עידוד לפעולה מסוימת, המרצה"] },
+            { id: 46, term: "הִבְלִיג", meanings: ["ריסן את עצמו, התאפק", "נמנע מלבטא רגש כלשהו"] },
+            { id: 47, term: "הִגֵּר", meanings: ["עבר מארץ אחת לאחרת והשתקע בה לפרק זמן ממושך"] },
+            { id: 48, term: "הֲדוֹם", meanings: ["שרפרף נמוך, ספסל נמוך שהיושב מניח עליו את רגליו"] },
+            { id: 49, term: "הֶדְיוֹט", meanings: ["נטול ידיעות בתחום מסוים"] },
+            { id: 50, term: "הִטְמִיעַ", meanings: ["ספג, הפנים, גרם למשהו להפוך חלק בלתי נפרד ממשהו אחר"] },
+            { id: 51, term: "הִיפָּה / הִיסָּה", meanings: ["השתיק, השקיט, החריש"] },
+            { id: 52, term: "הִכְבִּיר בְּמִילִים", meanings: ["דיבר רבות באריכות יתרה, האריך בדברים"] },
+            { id: 53, term: "הִכְחִישׁ", meanings: ["טען שמשהו אינו נכון, שלל"] },
+            { id: 54, term: "הַס", meanings: ["מילת ציווי הדורשת שקט"] },
+            { id: 55, term: "הִסְכִּית", meanings: ["שתק והקשיב בריכוז, האזין, הטה אוזן"] },
+            { id: 56, term: "הִסְלִים", meanings: ["החריף, הקצין, הידרדר"] },
+            { id: 57, term: "הִסְמִיךְ", meanings: ["נתן לו סמכות, אישר לו לבצע משהו, ייפה את כוחו", "קֵרֵב, גרם להם להיות סמוכים (קרובים / קשורים)", "הפך משהו לפחות נוזלי"] },
+            { id: 58, term: "הֶעֱלָה אֲרוּכָה", meanings: ["הגליד (ארוכה = גלד, הרקמה הנוצרת תוך כדי תהליך הריפוי של הפצע)"] },
+            { id: 59, term: "הִפְלִיא בּוֹ אֶת מַכּוֹתָיו", meanings: ["הִכָּה אותו"] },
+            { id: 60, term: "הִפְלִיג בְּ-", meanings: ["הִרְבָּה, הפריז, הגזים, עשה משהו בשפע (הפליג בשבחו - שיבח אותו מאוד)"] },
+            { id: 61, term: "הִצְפִּין", meanings: ["נע צפונה", "העלים, החביא"] },
+            { id: 62, term: "הֵקִיץ", meanings: ["התעורר משנתו, נעוֹר"] },
+            { id: 63, term: "הִשְׁחִיז", meanings: ["ליטש וחידד את הלהב"] },
+            { id: 64, term: "הִשְׁתָּאוּת", meanings: ["פליאה"] },
+            { id: 65, term: "הִתְבַּשֵּׂר", meanings: ["קיבל או שמע בשורה (בדרך כלל בשורה טובה)"] },
+            { id: 66, term: "הִתְגּוֹדֵד", meanings: ["התקהל, התאסף"] },
+            { id: 67, term: "הִתְחַלָּה", meanings: ["העמיד פני חולה, התחזה לחולה"] },
+            { id: 68, term: "הִתְחַסֵּד", meanings: ["העמיד פני צדיק"] },
+            { id: 69, term: "הִתִּיר", meanings: ["שחרר (התיר את הקשר - פתח את הקשר)", "אִפְשֵׁר, הסכים, אישר (מהמילה מותר)"] },
+            { id: 70, term: "הִתְכַּתֵּשׁ", meanings: ["נאבק"] },
+            { id: 71, term: "הִתְמוֹגֵג", meanings: ["התענג, נהנה, רווה נחת"] },
+            { id: 72, term: "הִתַּמֵּר", meanings: ["התרומם כלפי מעלה, התנשא"] },
+            { id: 73, term: "הִתְנַבֵּא", meanings: ["השמיע ניבוי או חיזוי כלשהו"] },
+            { id: 74, term: "הִתְנַכֵּר", meanings: ["העמיד פנים כאילו אין לו קשר אליו, התעלם ממנו במכוון"] },
+            { id: 75, term: "הִתְנַצֵּחַ", meanings: ["התווכח"] },
+            { id: 76, term: "הִתְעַמֵּר", meanings: ["התעלל, התאכזר"] },
+            { id: 77, term: "הִתְעַרְטֵל", meanings: ["פשט את בגדיו"] },
+            { id: 78, term: "הִתְרָה", meanings: ["הזהיר"] },
+            { id: 79, term: "הִתְרַצָּה", meanings: ["נענה לבקשה לאחר שכנוע רב, הסכים"] },
+            { id: 80, term: "זַבָּן", meanings: ["מוכר בחנות"] },
+            { id: 81, term: "זֶרֶד", meanings: ["ענף"] },
+            { id: 82, term: "זָרָה מֶלַח עַל הַפְּצָעִים", meanings: ["הוסיף על צערו, דרך לו על היבלות, נגע בעצב רגיש (זרה - פיזר)"] },
+            { id: 83, term: "חָס", meanings: ["ריחם"] },
+            { id: 84, term: "חֲרִי (אַף)", meanings: ["כעס, חמה, זעם"] },
+            { id: 85, term: "חָרִישׁ", meanings: ["ביתור האדמה במחרשה כדי שתהיה נוחה לזריעה", "העונה שחורשים ומפלחים בה את האדמה"] },
+            { id: 86, term: "חֲרִישִׁי", meanings: ["שָׁקֶט"] },
+            { id: 87, term: "חָרַךְ", meanings: ["שרף קלות באש, צרב", "חריץ או חור בקיר"] },
+            { id: 88, term: "טָוָה", meanings: ["חיבר, צירף", "שָׁזַר, יצר חוטים מחומר גולמי"] },
+            { id: 89, term: "טְלַאי", meanings: ["חתיכת בד שתופרים על בגד לצורך תיקון קרע"] },
+            { id: 90, term: "טְרָשִׁים", meanings: ["אדמה סלעית שקשה לעבד"] },
+            { id: 91, term: "יָגֵעַ", meanings: ["עייף מרוב עבודה, תשוש"] },
+            { id: 92, term: "יָד רוֹחֶצֶת יָד", meanings: ["אחד עוזר לשני, שמור לי ואשמור לך (בדרך כלל בהקשר שלילי)"] },
+            { id: 93, term: "יְקִיצָה", meanings: ["התעוררות משינה, חוסר שינה, ערנות"] },
+            { id: 94, term: "יַרְכָתַיִים", meanings: ["החלק האחורי של הספינה"] },
+            { id: 95, term: "כְּבַד לָשׁוֹן / פֶּה", meanings: ["מגמגם, מתקשה בדיבור"] },
+            { id: 96, term: "כִּיחֵד", meanings: ["הסתיר, העלים, לא גילה את כל האמת, שיקר"] },
+            { id: 97, term: "כִּילָּה", meanings: ["סיים, גמר", "רשת שפורשים מעל למיטה להגן על השוכבים בה מיתושים וזבובים", "השמיד, חיסל"] },
+            { id: 98, term: "כֵּן / כַּנָּה", meanings: ["בסיס שעליו מעמידים דבר כלשהו"] },
+            { id: 99, term: "כְּסָיָה", meanings: ["כפפה"] },
+            { id: 100, term: "כְּרַךְ", meanings: ["עיר גדולה"] },
+            { id: 101, term: "לֵאוּת", meanings: ["יגעות, עייפות, תשישות"] },
+            { id: 102, term: "לְדִידוֹ", meanings: ["מבחינתו, מצידו, לדעתו"] },
+            { id: 103, term: "לַהַג", meanings: ["פטפוט, ריבוי דברים בלא טעם"] },
+            { id: 104, term: "לַהֲגָן", meanings: ["פטפטן, שמדבר בלי סוף"] },
+            { id: 105, term: "לוּלֵא", meanings: ["אם לא"] },
+            { id: 106, term: "לִיבָּה", meanings: ["החלק המרכזי והחשוב ביותר במשהו, גרעין", "החלק הפנימי של הפרי בו מרוכזים הזרעים", "הגדיל את הלהבה", "הגביר, הסעיר"] },
+            { id: 107, term: "לִיטֵשׁ", meanings: ["נתן מראה חלק או מבריק באמצעות שפשוף/החלקה", "שיפר, עיבד, עשה \"פִינִיש\""] },
+            { id: 108, term: "לִמְגִינַת לִבּוֹ", meanings: ["לצערו, למורת רוחו"] },
+            { id: 109, term: "מַאֲכֶלֶת", meanings: ["סכין לשחיטה, חַלֶף"] },
+            { id: 110, term: "מֵאֵן", meanings: ["לא הסכים, התנגד, סרב"] },
+            { id: 111, term: "מְבוּסָם", meanings: ["שיכור קלות, שתוי"] },
+            { id: 112, term: "מַגָּל", meanings: ["כלי עבודה לקצירת תבואה (עשוי מסכין בצורת חצי ירח)"] },
+            { id: 113, term: "מָהוּהַּ", meanings: ["בלוי, מרופט, שחוק"] },
+            { id: 114, term: "מַזְמֵרָה", meanings: ["כלי גינה המשמש לקיצוץ הענפים"] },
+            { id: 115, term: "מִכְמוֹרֶת", meanings: ["רשת גדולה המשמשת בעיקר לדייג, מצודה (רשת דייגים)"] },
+            { id: 116, term: "מֵלִיץ יוֹשֶׁר", meanings: ["סנגור, מי שטוען לזכותו של מישהו"] },
+            { id: 117, term: "מָסִיק", meanings: ["קטיף זיתים, עונת קטיף הזיתים"] },
+            { id: 118, term: "מִסְעָד", meanings: ["תמיכה, משענת"] },
+            { id: 119, term: "מַפַּח נֶפֶשׁ", meanings: ["אכזבה גדולה"] },
+            { id: 120, term: "מִצְנֶפֶת", meanings: ["כובע בד, מגבעת"] },
+            { id: 121, term: "מִרְבָּץ", meanings: ["רובד קרקע שמצויים בו מחצבים (מרבץ יהלומים - אזור בו יש יהלומים רבים לכרייה)"] },
+            { id: 122, term: "מְשׁוּנָן", meanings: ["בעל שיניים או בעל צורה של שיניים"] },
+            { id: 123, term: "מְתַאֲבֵן", meanings: ["מאכל המוגש בתחילת הארוחה על-מנת להגביר את התיאבון"] },
+            { id: 124, term: "נִגַּף", meanings: ["הובס, נוצח"] },
+            { id: 125, term: "נֶגֶף", meanings: ["מחלה קשה המפילה חללים רבים", "תקלה, מכשול (אֶבֶן נֶגֶף - מכשול)"] },
+            { id: 126, term: "נָדָן", meanings: ["נרתיק החרב"] },
+            { id: 127, term: "נָהִיר", meanings: ["ברור, מובן"] },
+            { id: 128, term: "נֶהֶנְתָן", meanings: ["רודף תענוגות"] },
+            { id: 129, term: "נוֹטֵר", meanings: ["שומר, מאבטח"] },
+            { id: 130, term: "נוֹטֵר טִינָה", meanings: ["לא סולח, שומר כעס"] },
+            { id: 131, term: "נוּל", meanings: ["מכונת אריגה"] },
+            { id: 132, term: "נְחִיל", meanings: ["להקת חרקים"] },
+            { id: 133, term: "נֶחָמָה פּוּרְתָּא", meanings: ["נחמה כלשהי, נחמה מועטה"] },
+            { id: 134, term: "נַחְשׁוֹל", meanings: ["גל גדול"] },
+            { id: 135, term: "נִטְמַע", meanings: ["נקלט והפך לחלק מקבוצה מסוימת, נבלע"] },
+            { id: 136, term: "נִיחָא", meanings: ["מילא, אין דבר"] },
+            { id: 137, term: "נִחַם", meanings: ["התחרט על מה שעשה, הצטער"] },
+            { id: 138, term: "נִיפָה", meanings: ["סינן, ניקה, ברר"] },
+            { id: 139, term: "נִכּוּשׁ", meanings: ["עקירת עשבים שוטים"] },
+            { id: 140, term: "נִכְלָם", meanings: ["מבויש, בוש (בּוֹשׁ וְנִכְלָם - הִתְבַּיֵּשׁ מאוד), כלימה = בושה"] },
+            { id: 141, term: "נֶעְתַּר", meanings: ["הסכים, השיב בחיוב"] },
+            { id: 142, term: "נִפְעָם", meanings: ["נרגש"] },
+            { id: 143, term: "נִקְוָוה", meanings: ["זרם והצטבר במקום כלשהו"] },
+            { id: 144, term: "נִרְגָּן", meanings: ["רוטן ומתלונן כל עת"] },
+            { id: 145, term: "נִרְפָּה", meanings: ["עצלן, רשלן"] },
+            { id: 146, term: "סַבָּר", meanings: ["סבל בנמל"] },
+            { id: 147, term: "סוֹרֵר", meanings: ["מרדן, סרבן, חסר משמעת"] },
+            { id: 148, term: "סַיָּיס", meanings: ["עובד המטפל בסוסים"] },
+            { id: 149, term: "סִיקֵל", meanings: ["פינה אבנים, ניקה את השטח מאבנים"] },
+            { id: 150, term: "סָנֵגוֹר", meanings: ["עורך דין המגן על הנאשם"] },
+            { id: 151, term: "סִתֵּת", meanings: ["הקציע והחליק אבנים"] },
+            { id: 152, term: "סַתָּת", meanings: ["מחליק ומהקצע אבנים, בעל מקצוע שמסתת אבנים"] },
+            { id: 153, term: "עִילֵּג", meanings: ["מדבר בצורה לא ברורה, כבד דיבור"] },
+            { id: 154, term: "עַלְוָוה", meanings: ["כלל העלים המכסים את העץ"] },
+            { id: 155, term: "עָמַד מִנֶּגֶד / מִן הַצַּד", meanings: ["לא התערב"] },
+            { id: 156, term: "עָרֵב", meanings: ["מי שמתחייב לפרוע חוב של אחר והיה והאחר לא יעמוד בהתחייבויותיו", "נעים לשמיעה (נאמר גם על אוכל: ערב לחך - טעים)"] },
+            { id: 157, term: "פִּיר", meanings: ["חור, בור (פיר המעלית - ה\"שרוול\" בו עוברת המעלית)"] },
+            { id: 158, term: "פָּלָה", meanings: ["הוציא כינים (מהשיער, מהפרווה וכדומה)"] },
+            { id: 159, term: "פָּמַלְיָה", meanings: ["בני-לוויה"] },
+            { id: 160, term: "פֶּרֶא", meanings: ["חמור הבר", "חסר תרבות"] },
+            { id: 161, term: "צִדֵּד", meanings: ["הפנה דבר מה הצידה, הטה", "הביט מן הצד, הביט מזווית בעין", "תמך ב-, דגל ב-"] },
+            { id: 162, term: "קוֹרֶט / קַרְטוֹב", meanings: ["מעט, כמות קטנה"] },
+            { id: 163, term: "קוּשְׁיָה", meanings: ["שאלה, בעיה, חידה"] },
+            { id: 164, term: "קוֹשֵׁשׁ", meanings: ["אסף עצים או קש למדורה"] },
+            { id: 165, term: "קִיטוֹן", meanings: ["חדר קטן, חדר שינה"] },
+            { id: 166, term: "קָמַל", meanings: ["נבל (להיפך: לבלב)"] },
+            { id: 167, term: "קְרִיסָה", meanings: ["התמוטטות, הרס"] },
+            { id: 168, term: "קְרִישָׁה", meanings: ["התעבות של נוזל והפיכתו לסמיך וקרוש"] },
+            { id: 169, term: "קָשַׁר (לוֹ) כְּתָרִים", meanings: ["שיבח אותו מאוד"] },
+            { id: 170, term: "קַת", meanings: ["החלק האחורי של הנשק שבא במגע עם הכתף, ידית"] },
+            { id: 171, term: "רָדָה", meanings: ["אסף דבש מהכוורת", "שלט ביד רמה, משל"] },
+            { id: 172, term: "רָוָוה", meanings: ["שתה עד שלא הרגיש צמא יותר"] },
+            { id: 173, term: "רָקִיק", meanings: ["מאפה שטוח ודק, עוגיה שטוחה"] },
+            { id: 174, term: "רֶשֶׁף", meanings: ["הבזק אש, גחלת, ניצוץ"] },
+            { id: 175, term: "רָשַׁף", meanings: ["התיז רשפים או ניצוצות. בהשאלה: כעס, נמלא חימה ותוכחה"] },
+            { id: 176, term: "שָׁאוֹן", meanings: ["קול, המולה, רעש"] },
+            { id: 177, term: "שְׁאַט נֶפֶשׁ", meanings: ["תחושת סלידה (שאט - בוז)"] },
+            { id: 178, term: "שׁוֹקֵק (חַיִּים)", meanings: ["מלא אנשים, פעילות מרובה"] },
+            { id: 179, term: "שִׁיסָּה", meanings: ["גרם למישהו לתקוף אחר, הסית"] },
+            { id: 180, term: "שָׁכִיחַ", meanings: ["נפוץ, מצוי (להיפך: נדיר)"] },
+            { id: 181, term: "שָׁכַךְ", meanings: ["נרגע, שקט, דמם"] },
+            { id: 182, term: "שָׁלָה", meanings: ["הוציא מתוך נוזל"] },
+            { id: 183, term: "שַׁמַּאי", meanings: ["מי שתפקידו להעריך את שווי הנכס"] },
+            { id: 184, term: "תֶּלֶם", meanings: ["החריץ שנוצר בעת חרישת האדמה"] }
+        ];
+
+        const state = {
+            roundNumber: 1,
+            roundSize: 10,
+            wordFilter: 'all',
+            direction: 'term-to-def',
+            showPolyHint: true,
+            masteredIds: new Set(),
+            missedPoolIds: [],
+            currentRoundQueue: [],
+            currentQueueIndex: 0,
+            roundCorrectCount: 0,
+            roundMissedItems: [],
+            currentQuestion: null,
+            isAnswered: false,
+            chartInstance: null
+        };
+
+        const els = {
+            roundTitle: document.getElementById('round-title'),
+            filterSubtitle: document.getElementById('filter-subtitle'),
+            seg0: document.getElementById('seg-0'),
+            seg1: document.getElementById('seg-1'),
+            seg2: document.getElementById('seg-2'),
+            seg3: document.getElementById('seg-3'),
+            masteredPill: document.getElementById('mastered-pill'),
+            totalPill: document.getElementById('total-pill'),
+            questionStage: document.getElementById('question-stage'),
+            roundSummaryStage: document.getElementById('round-summary-stage'),
+            questionDirectionBadge: document.getElementById('question-direction-badge'),
+            polysemyHintBadge: document.getElementById('polysemy-hint-badge'),
+            termDisplay: document.getElementById('term-display'),
+            roundCounterText: document.getElementById('round-counter-text'),
+            optionsList: document.getElementById('options-list'),
+            feedbackPanel: document.getElementById('feedback-panel'),
+            feedbackStatusTitle: document.getElementById('feedback-status-title'),
+            feedbackWordTag: document.getElementById('feedback-word-tag'),
+            allMeaningsBox: document.getElementById('all-meanings-box'),
+            nextQuestionBtn: document.getElementById('next-question-btn'),
+            summaryHeading: document.getElementById('summary-heading'),
+            summarySubtext: document.getElementById('summary-subtext'),
+            sumRoundCorrect: document.getElementById('sum-round-correct'),
+            sumRoundMissed: document.getElementById('sum-round-missed'),
+            sumTotalMastered: document.getElementById('sum-total-mastered'),
+            missedWordsPreview: document.getElementById('missed-words-preview'),
+            missedWordsList: document.getElementById('missed-words-list'),
+            continueNextRoundBtn: document.getElementById('continue-next-round-btn'),
+            restartUnitBtn: document.getElementById('restart-unit-btn'),
+            openSettingsBtn: document.getElementById('open-settings-btn'),
+            closeSettingsBtn: document.getElementById('close-settings-btn'),
+            settingsModal: document.getElementById('settings-modal'),
+            settingRoundSize: document.getElementById('setting-round-size'),
+            settingWordFilter: document.getElementById('setting-word-filter'),
+            settingDirection: document.getElementById('setting-direction'),
+            settingShowPolyHint: document.getElementById('setting-show-poly-hint'),
+            applySettingsBtn: document.getElementById('apply-settings-btn'),
+            resetProgressSettingsBtn: document.getElementById('reset-progress-settings-btn'),
+            openOverviewBtn: document.getElementById('open-overview-btn'),
+            closeOverviewBtn: document.getElementById('close-overview-btn'),
+            overviewModal: document.getElementById('overview-modal'),
+            resumeStudyBtn: document.getElementById('resume-study-btn'),
+            glossarySearchInput: document.getElementById('glossary-search-input'),
+            glossaryTypeFilter: document.getElementById('glossary-type-filter'),
+            glossaryItemsContainer: document.getElementById('glossary-items-container')
+        };
+
+        function getFilteredPool() {
+            if (state.wordFilter === 'poly') {
+                return unit1Words.filter(w => w.meanings.length > 1);
+            }
+            if (state.wordFilter === 'single') {
+                return unit1Words.filter(w => w.meanings.length === 1);
+            }
+            return unit1Words;
+        }
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function updateProgressUI() {
+            const pool = getFilteredPool();
+            const total = pool.length;
+            const masteredInPool = pool.filter(w => state.masteredIds.has(w.id)).length;
+
+            els.masteredPill.textContent = masteredInPool;
+            els.totalPill.textContent = total;
+            els.roundTitle.textContent = `יחידה 1 • סיבוב ${state.roundNumber}`;
+
+            if (state.wordFilter === 'poly') {
+                els.filterSubtitle.textContent = `מילים רב-משמעיות ביחידה 1 (${total})`;
+            } else if (state.wordFilter === 'single') {
+                els.filterSubtitle.textContent = `מילים בעלות פירוש יחיד ביחידה 1 (${total})`;
+            } else {
+                els.filterSubtitle.textContent = `כל מילות היחידה (${total})`;
+            }
+
+            const pct = total > 0 ? (masteredInPool / total) * 100 : 0;
+            const segs = [els.seg0, els.seg1, els.seg2, els.seg3];
+            segs.forEach((seg, idx) => {
+                const segStart = idx * 25;
+                const segEnd = (idx + 1) * 25;
+                if (pct >= segEnd) {
+                    seg.style.width = '100%';
+                } else if (pct <= segStart) {
+                    seg.style.width = '0%';
+                } else {
+                    const innerPct = ((pct - segStart) / 25) * 100;
+                    seg.style.width = `${innerPct}%`;
+                }
+            });
+        }
+
+        function buildNextRound() {
+            const pool = getFilteredPool();
+            const unmastered = pool.filter(w => !state.masteredIds.has(w.id));
+
+            if (unmastered.length === 0) {
+                state.masteredIds.clear();
+                state.missedPoolIds = [];
+                state.roundNumber = 1;
+                return buildNextRound();
+            }
+
+            const priorityItems = unmastered.filter(w => state.missedPoolIds.includes(w.id));
+            const freshItems = shuffleArray(unmastered.filter(w => !state.missedPoolIds.includes(w.id)));
+
+            const combined = [...shuffleArray(priorityItems), ...freshItems];
+            const size = Math.min(state.roundSize, combined.length);
+            state.currentRoundQueue = combined.slice(0, size);
+            state.currentQueueIndex = 0;
+            state.roundCorrectCount = 0;
+            state.roundMissedItems = [];
+            state.missedPoolIds = [];
+
+            updateProgressUI();
+            showQuestionStage();
+            renderCurrentQuestion();
+        }
+
+        function showQuestionStage() {
+            els.roundSummaryStage.classList.add('hidden');
+            els.questionStage.classList.remove('hidden');
+        }
+
+        function buildQuestionData(wordObj) {
+            const isTermToDef = state.direction === 'term-to-def';
+            const chosenMeaningIdx = Math.floor(Math.random() * wordObj.meanings.length);
+            const chosenMeaning = wordObj.meanings[chosenMeaningIdx];
+
+            const otherWords = shuffleArray(unit1Words.filter(w => w.id !== wordObj.id));
+            const distractors = [];
+
+            for (let i = 0; i < otherWords.length && distractors.length < 3; i++) {
+                const candidate = otherWords[i];
+                if (isTermToDef) {
+                    const randDef = candidate.meanings[Math.floor(Math.random() * candidate.meanings.length)];
+                    if (!wordObj.meanings.includes(randDef) && !distractors.some(d => d.text === randDef)) {
+                        distractors.push({ text: randDef, isCorrect: false, sourceWord: candidate });
+                    }
+                } else {
+                    if (!distractors.some(d => d.text === candidate.term)) {
+                        distractors.push({ text: candidate.term, isCorrect: false, sourceWord: candidate });
+                    }
+                }
+            }
+
+            const correctChoice = {
+                text: isTermToDef ? chosenMeaning : wordObj.term,
+                isCorrect: true,
+                sourceWord: wordObj
+            };
+
+            const choices = shuffleArray([correctChoice, ...distractors]);
+
+            return {
+                word: wordObj,
+                promptText: isTermToDef ? wordObj.term : chosenMeaning,
+                choices
+            };
+        }
+
+        function renderCurrentQuestion() {
+            const wordObj = state.currentRoundQueue[state.currentQueueIndex];
+            state.currentQuestion = buildQuestionData(wordObj);
+            state.isAnswered = false;
+
+            els.questionStage.classList.remove('fade-slide');
+            void els.questionStage.offsetWidth;
+            els.questionStage.classList.add('fade-slide');
+
+            const isTermToDef = state.direction === 'term-to-def';
+            els.questionDirectionBadge.textContent = isTermToDef ? 'מילה מתוך יחידה 1' : 'פירוש מתוך יחידה 1';
+
+            if (state.showPolyHint && wordObj.meanings.length > 1) {
+                els.polysemyHintBadge.textContent = `רב-משמעי • ${wordObj.meanings.length} פירושים`;
+                els.polysemyHintBadge.classList.remove('hidden');
+            } else {
+                els.polysemyHintBadge.classList.add('hidden');
+            }
+
+            els.termDisplay.textContent = state.currentQuestion.promptText;
+            els.termDisplay.className = isTermToDef
+                ? 'text-3xl sm:text-4xl font-bold text-white leading-relaxed tracking-normal text-right'
+                : 'text-xl sm:text-2xl font-bold text-white leading-relaxed tracking-normal text-right';
+
+            els.roundCounterText.textContent = `שאלה ${state.currentQueueIndex + 1} מתוך ${state.currentRoundQueue.length}`;
+
+            els.feedbackPanel.classList.add('hidden');
+            els.optionsList.innerHTML = '';
+
+            state.currentQuestion.choices.forEach((choice, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'w-full text-right rounded-xl border-2 border-[#2E3856] bg-[#0A092D] hover:border-[#4255FF] hover:bg-[#13113C] px-5 py-4 text-base text-slate-100 font-medium transition-all flex items-center justify-between gap-3 cursor-pointer';
+                btn.innerHTML = `
+                    <span class="leading-snug">${choice.text}</span>
+                    <span class="text-xs font-bold text-slate-500 border border-[#2E3856] rounded-md w-6 h-6 flex items-center justify-center shrink-0" id="opt-key-${idx}">${idx + 1}</span>
+                `;
+                btn.addEventListener('click', () => handleOptionSelect(idx));
+                els.optionsList.appendChild(btn);
+            });
+        }
+
+        function handleOptionSelect(selectedIdx) {
+            if (state.isAnswered) return;
+            state.isAnswered = true;
+
+            const q = state.currentQuestion;
+            const selectedChoice = q.choices[selectedIdx];
+            const buttons = els.optionsList.children;
+
+            q.choices.forEach((choice, idx) => {
+                const btn = buttons[idx];
+                const badge = document.getElementById(`opt-key-${idx}`);
+                btn.classList.remove('hover:border-[#4255FF]', 'hover:bg-[#13113C]', 'cursor-pointer');
+                btn.classList.add('cursor-default');
+
+                if (choice.isCorrect) {
+                    btn.className = 'w-full text-right rounded-xl border-2 border-[#18AE79] bg-[#18AE79]/15 px-5 py-4 text-base text-white font-bold transition-all flex items-center justify-between gap-3';
+                    badge.className = 'text-xs font-extrabold text-white bg-[#18AE79] rounded-full w-6 h-6 flex items-center justify-center shrink-0';
+                    badge.textContent = '✓';
+                } else if (idx === selectedIdx) {
+                    btn.className = 'w-full text-right rounded-xl border-2 border-[#FF725B] bg-[#FF725B]/15 px-5 py-4 text-base text-white font-medium transition-all flex items-center justify-between gap-3';
+                    badge.className = 'text-xs font-extrabold text-white bg-[#FF725B] rounded-full w-6 h-6 flex items-center justify-center shrink-0';
+                    badge.textContent = '✕';
+                } else {
+                    btn.className = 'w-full text-right rounded-xl border-2 border-[#2E3856]/60 bg-[#0A092D] px-5 py-4 text-base text-slate-400 font-medium opacity-60 transition-all flex items-center justify-between gap-3';
+                }
+            });
+
+            if (selectedChoice.isCorrect) {
+                state.masteredIds.add(q.word.id);
+                state.roundCorrectCount++;
+                els.feedbackStatusTitle.textContent = 'כל הכבוד! תשובה נכונה ✓';
+                els.feedbackStatusTitle.className = 'text-sm font-extrabold text-[#18AE79]';
+            } else {
+                state.missedPoolIds.push(q.word.id);
+                if (!state.roundMissedItems.some(item => item.id === q.word.id)) {
+                    state.roundMissedItems.push(q.word);
+                }
+                els.feedbackStatusTitle.textContent = 'לא נורא — המילה תחזור לחיזוק בסיבוב הבא';
+                els.feedbackStatusTitle.className = 'text-sm font-extrabold text-[#FF725B]';
+            }
+
+            updateProgressUI();
+
+            els.feedbackWordTag.textContent = q.word.meanings.length > 1
+                ? `${q.word.term} (${q.word.meanings.length} פירושים)`
+                : q.word.term;
+
+            els.allMeaningsBox.innerHTML = '';
+            q.word.meanings.forEach((m, mIdx) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-start gap-2';
+                const numPrefix = q.word.meanings.length > 1
+                    ? `<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[#4255FF]/25 text-[#93A5FF] text-xs font-bold shrink-0 mt-0.5">${mIdx + 1}</span>`
+                    : `<span class="text-[#18AE79] font-bold">•</span>`;
+                row.innerHTML = `${numPrefix}<span>${m}</span>`;
+                els.allMeaningsBox.appendChild(row);
+            });
+
+            if (state.currentQueueIndex === state.currentRoundQueue.length - 1) {
+                els.nextQuestionBtn.innerHTML = `<span>לסיכום סיבוב ${state.roundNumber}</span> <span>⬅</span>`;
+            } else {
+                els.nextQuestionBtn.innerHTML = `<span>המשך לשאלה הבאה</span> <span>⬅</span>`;
+            }
+
+            els.feedbackPanel.classList.remove('hidden');
+        }
+
+        function advanceQuestion() {
+            if (!state.isAnswered) return;
+            if (state.currentQueueIndex < state.currentRoundQueue.length - 1) {
+                state.currentQueueIndex++;
+                renderCurrentQuestion();
+            } else {
+                showRoundSummary();
+            }
+        }
+
+        function showRoundSummary() {
+            els.questionStage.classList.add('hidden');
+            els.roundSummaryStage.classList.remove('hidden');
+
+            const pool = getFilteredPool();
+            const masteredInPool = pool.filter(w => state.masteredIds.has(w.id)).length;
+            const remainingUnmastered = pool.length - masteredInPool;
+
+            els.summaryHeading.textContent = remainingUnmastered === 0
+                ? 'מדהים! השלמת את כל יחידה 1! 🏆'
+                : `סיימת את סיבוב ${state.roundNumber}!`;
+
+            els.summarySubtext.textContent = remainingUnmastered === 0
+                ? 'שלטת בכל מילות היחידה. תוכל להתחיל את היחידה מחדש או לשנות סינון בהגדרות.'
+                : `נותרו עוד ${remainingUnmastered} מילים להשלמת השליטה המלאה ביחידה 1.`;
+
+            els.sumRoundCorrect.textContent = state.roundCorrectCount;
+            els.sumRoundMissed.textContent = state.roundMissedItems.length;
+            els.sumTotalMastered.textContent = `${masteredInPool} / ${pool.length}`;
+
+            if (state.roundMissedItems.length > 0) {
+                els.missedWordsPreview.classList.remove('hidden');
+                els.missedWordsList.innerHTML = '';
+                state.roundMissedItems.forEach(w => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'border-b border-[#2E3856]/60 pb-1.5 last:border-b-0';
+                    itemEl.innerHTML = `<span class="font-bold text-white">${w.term}:</span> <span class="text-slate-300">${w.meanings.join(' | ')}</span>`;
+                    els.missedWordsList.appendChild(itemEl);
+                });
+            } else {
+                els.missedWordsPreview.classList.add('hidden');
+            }
+
+            if (remainingUnmastered === 0) {
+                els.continueNextRoundBtn.textContent = 'תרגול חוזר על כל יחידה 1 🔄';
+            } else {
+                els.continueNextRoundBtn.textContent = `המשך לסיבוב ${state.roundNumber + 1} ⬅`;
+            }
+        }
+
+        function renderOverviewChart() {
+            const canvas = document.getElementById('unit1-chart');
+            const ctx = canvas.getContext('2d');
+
+            const masteredCount = state.masteredIds.size;
+            const multiUnmastered = unit1Words.filter(w => !state.masteredIds.has(w.id) && w.meanings.length > 1).length;
+            const singleUnmastered = unit1Words.filter(w => !state.masteredIds.has(w.id) && w.meanings.length === 1).length;
+
+            if (state.chartInstance) {
+                state.chartInstance.destroy();
+            }
+
+            state.chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'מילים שנלמדו (✓)',
+                        'רב-משמעיות (טרם נלמדו)',
+                        'פירוש יחיד (טרם נלמדו)'
+                    ],
+                    datasets: [{
+                        data: [masteredCount, multiUnmastered, singleUnmastered],
+                        backgroundColor: ['#18AE79', '#F59E0B', '#4255FF'],
+                        borderColor: '#0A092D',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#E2E8F0',
+                                font: { family: 'Heebo', size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderGlossaryList() {
+            const query = els.glossarySearchInput.value.trim();
+            const typeFilter = els.glossaryTypeFilter.value;
+
+            const filtered = unit1Words.filter(w => {
+                if (typeFilter === 'poly' && w.meanings.length < 2) return false;
+                if (typeFilter === 'mastered' && !state.masteredIds.has(w.id)) return false;
+                if (typeFilter === 'unmastered' && state.masteredIds.has(w.id)) return false;
+
+                if (query.length > 0) {
+                    const plainTerm = w.term.replace(/[\u0591-\u05C7]/g, '');
+                    const plainQuery = query.replace(/[\u0591-\u05C7]/g, '');
+                    const inTerm = w.term.includes(query) || plainTerm.includes(plainQuery);
+                    const inMeanings = w.meanings.some(m => m.includes(query));
+                    return inTerm || inMeanings;
+                }
+                return true;
+            });
+
+            els.glossaryItemsContainer.innerHTML = '';
+            if (filtered.length === 0) {
+                els.glossaryItemsContainer.innerHTML = '<div class="text-center text-xs text-slate-400 py-6">לא נמצאו מילים התואמות לחיפוש.</div>';
+                return;
+            }
+
+            filtered.forEach(w => {
+                const isMastered = state.masteredIds.has(w.id);
+                const card = document.createElement('div');
+                card.className = 'rounded-xl bg-[#0A092D] border border-[#2E3856] p-3 flex items-start justify-between gap-3';
+                const polyBadge = w.meanings.length > 1
+                    ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-400/30 mr-2">${w.meanings.length} פירושים</span>`
+                    : '';
+                const statusIcon = isMastered
+                    ? '<span class="text-xs font-extrabold text-[#18AE79] shrink-0">✓ נלמד</span>'
+                    : '<span class="text-xs text-slate-500 shrink-0">ממתין</span>';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="font-bold text-white text-sm mb-1">${w.term}${polyBadge}</div>
+                        <div class="text-xs text-slate-300 leading-relaxed">${w.meanings.map((m, i) => w.meanings.length > 1 ? `(${i + 1}) ${m}` : m).join(' • ')}</div>
+                    </div>
+                    ${statusIcon}
+                `;
+                els.glossaryItemsContainer.appendChild(card);
+            });
+        }
+
+        els.nextQuestionBtn.addEventListener('click', advanceQuestion);
+
+        els.continueNextRoundBtn.addEventListener('click', () => {
+            state.roundNumber++;
+            buildNextRound();
+        });
+
+        els.restartUnitBtn.addEventListener('click', () => {
+            state.masteredIds.clear();
+            state.missedPoolIds = [];
+            state.roundNumber = 1;
+            buildNextRound();
+        });
+
+        els.openSettingsBtn.addEventListener('click', () => {
+            els.settingsModal.classList.remove('hidden');
+        });
+        els.closeSettingsBtn.addEventListener('click', () => {
+            els.settingsModal.classList.add('hidden');
+        });
+        els.applySettingsBtn.addEventListener('click', () => {
+            state.roundSize = parseInt(els.settingRoundSize.value, 10);
+            state.wordFilter = els.settingWordFilter.value;
+            state.direction = els.settingDirection.value;
+            state.showPolyHint = els.settingShowPolyHint.checked;
+            state.roundNumber = 1;
+            els.settingsModal.classList.add('hidden');
+            buildNextRound();
+        });
+        els.resetProgressSettingsBtn.addEventListener('click', () => {
+            state.masteredIds.clear();
+            state.missedPoolIds = [];
+            state.roundNumber = 1;
+            els.settingsModal.classList.add('hidden');
+            buildNextRound();
+        });
+
+        els.openOverviewBtn.addEventListener('click', () => {
+            els.overviewModal.classList.remove('hidden');
+            renderOverviewChart();
+            renderGlossaryList();
+        });
+        els.closeOverviewBtn.addEventListener('click', () => {
+            els.overviewModal.classList.add('hidden');
+        });
+        els.resumeStudyBtn.addEventListener('click', () => {
+            els.overviewModal.classList.add('hidden');
+        });
+        els.glossarySearchInput.addEventListener('input', renderGlossaryList);
+        els.glossaryTypeFilter.addEventListener('change', renderGlossaryList);
+
+        document.addEventListener('keydown', (e) => {
+            if (!els.settingsModal.classList.contains('hidden') || !els.overviewModal.classList.contains('hidden')) {
+                if (e.key === 'Escape') {
+                    els.settingsModal.classList.add('hidden');
+                    els.overviewModal.classList.add('hidden');
+                }
+                return;
+            }
+            if (!els.questionStage.classList.contains('hidden')) {
+                if (!state.isAnswered && ['1', '2', '3', '4'].includes(e.key)) {
+                    handleOptionSelect(parseInt(e.key, 10) - 1);
+                } else if (state.isAnswered && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    advanceQuestion();
+                }
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            buildNextRound();
+        });
+    </script>
+</body>
+</html>
