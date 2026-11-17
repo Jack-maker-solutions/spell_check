@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>יחידה 1 — מילון פסיכומטרי קמפוס IL</title>
+    <title>מילון פסיכומטרי קמפוס IL — כל 10 היחידות</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -22,18 +22,19 @@
             max-width: 520px;
             margin-left: auto;
             margin-right: auto;
-            height: 230px;
-            max-height: 280px;
+            height: 220px;
+            max-height: 260px;
         }
         .fade-slide {
-            animation: fadeSlide 0.22s ease-out forwards;
+            animation: fadeSlide 0.2s ease-out forwards;
         }
         @keyframes fadeSlide {
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 5px;
+            height: 5px;
         }
         ::-webkit-scrollbar-track {
             background: #0A092D;
@@ -45,15 +46,26 @@
     </style>
 </head>
 <!-- Chosen Palette: Quizlet Midnight Indigo (#0A092D background, #13113C elevated surface, #2E3856 border & inactive track, #18AE79 emerald mastery accent, #4255FF royal indigo action, #FF725B coral error highlight) -->
-<!-- Application Structure Plan: Focused Quizlet-style Learn Mode SPA for Unit 1 of the Campus IL Psychometric Dictionary (all 184 entries). Designed to mirror the exact visual layout and spaced-repetition round mechanics requested: (1) Minimalist top bar with Overview/Dictionary drawer toggle (✕), dynamic Round indicator (סיבוב 1, סיבוב 2...), and Settings modal trigger (⚙); (2) 4-segment Quizlet mastery progress bar with floating emerald counter badge and total count pill; (3) Clean question stage displaying the niqqud-vocalized Hebrew word on the right and 4 stacked full-width answer cards below; (4) Instant pedagogical reveal displaying all numbered meanings for polysemous words and automatically re-queuing missed words into subsequent rounds until full mastery; (5) Unit 1 Overview & Analytics modal featuring a Chart.js Canvas progress breakdown and searchable full glossary. -->
-<!-- Visualization & Content Choices: All 184 Unit 1 entries from HEB_DIC_CAMPUS.pdf -> Goal: Active recall mastery of single and multi-meaning Hebrew words -> Viz: Quizlet 4-option active recall cards + segmented progress bar + Chart.js Canvas mastery donut/bar chart in overview modal -> Interaction: Click or keyboard 1-4 selection, instant multi-meaning reveal, spaced repetition rounds, round size & filter settings -> Library: Vanilla JS + Tailwind CSS + Chart.js Canvas. Confirming NO SVG and NO Mermaid JS. -->
+<!-- Application Structure Plan: Full 10-Unit Quizlet-style Learn Mode SPA for the Campus IL Psychometric Dictionary (all 10 units, 1,700+ entries). Designed with a persistent top Unit Switcher Grid/Bar (Units 1-10) accessible from every screen and state (mid-question, feedback, round summary, glossary/overview, or settings) so the learner can jump between any unit effortlessly while preserving per-unit mastery in localStorage. Includes segmented Quizlet progress bar, spaced repetition rounds, multi-meaning pedagogical reveal, and searchable unit glossary with Chart.js Canvas mastery analytics. -->
+<!-- Visualization & Content Choices: Complete 10-unit vocabulary dataset from HEB_DIC_CAMPUS.pdf -> Goal: Unit-by-unit active recall mastery of single and multi-meaning Hebrew words -> Viz: Persistent 10-unit quick switcher + Quizlet 4-option active recall cards + 4-segment progress bar + Chart.js Canvas mastery donut chart in overview modal -> Interaction: Instant unit switching from any step, click/keyboard 1-4 selection, multi-meaning reveal, spaced repetition rounds, round size & filter settings -> Library: Vanilla JS + Tailwind CSS + Chart.js Canvas. Confirming NO SVG and NO Mermaid JS. -->
 <body class="min-h-screen flex flex-col justify-between selection:bg-[#4255FF] selection:text-white">
 
-    <div class="w-full max-w-xl mx-auto px-4 pt-4 pb-6 flex-grow flex flex-col justify-between">
+    <nav aria-label="בחירת יחידת לימוד" class="sticky top-0 z-40 bg-[#0A092D]/95 backdrop-blur-md border-b border-[#2E3856]">
+        <div class="w-full max-w-xl mx-auto px-3 py-2.5">
+            <div class="flex items-center justify-between mb-1.5 px-0.5">
+                <span class="text-[11px] font-bold text-slate-400">מעבר מהיר בין יחידות הלימוד:</span>
+                <span id="global-mastery-badge" class="text-[11px] font-bold text-[#18AE79]">סה״כ שליטה: 0 מילים</span>
+            </div>
+            <div id="unit-switcher-bar" class="grid grid-cols-5 sm:grid-cols-10 gap-1.5">
+            </div>
+        </div>
+    </nav>
+
+    <div class="w-full max-w-xl mx-auto px-4 pt-3 pb-6 flex-grow flex flex-col justify-between">
 
         <div>
-            <header class="flex items-center justify-between py-2">
-                <button id="open-overview-btn" title="סקירת יחידה 1 ומילון מלא" class="w-11 h-11 rounded-full border border-[#2E3856] bg-[#13113C] hover:bg-[#1E1C52] hover:border-[#4255FF] text-white flex items-center justify-center text-lg font-bold transition-all">
+            <header class="flex items-center justify-between py-1.5">
+                <button id="open-overview-btn" title="סקירת היחידה ומילון מלא" class="w-11 h-11 rounded-full border border-[#2E3856] bg-[#13113C] hover:bg-[#1E1C52] hover:border-[#4255FF] text-white flex items-center justify-center text-lg font-bold transition-all">
                     ✕
                 </button>
 
@@ -62,7 +74,7 @@
                         יחידה 1 • סיבוב 1
                     </div>
                     <div id="filter-subtitle" class="text-[11px] text-slate-400">
-                        כל מילות היחידה (184)
+                        כל מילות היחידה
                     </div>
                 </div>
 
@@ -71,7 +83,7 @@
                 </button>
             </header>
 
-            <div class="mt-4 mb-6">
+            <div class="mt-3 mb-5">
                 <div class="relative flex items-center gap-2">
                     <div class="flex-1 grid grid-cols-4 gap-2 items-center">
                         <div class="h-2.5 rounded-full bg-[#2E3856] overflow-hidden">
@@ -93,14 +105,14 @@
                     </div>
 
                     <div id="total-pill" class="bg-[#2E3856] text-slate-200 font-bold text-xs px-3 py-1 rounded-full min-w-[42px] text-center">
-                        184
+                        0
                     </div>
                 </div>
             </div>
         </div>
 
         <main id="question-stage" class="flex-grow flex flex-col justify-between fade-slide">
-            <div class="my-auto py-8 sm:py-12 px-1">
+            <div class="my-auto py-6 sm:py-10 px-1">
                 <div class="flex items-center gap-2 mb-2">
                     <span id="question-direction-badge" class="text-xs font-semibold text-slate-400">
                         מילה מתוך יחידה 1
@@ -110,11 +122,10 @@
                     </span>
                 </div>
                 <h1 id="term-display" class="text-3xl sm:text-4xl font-bold text-white leading-relaxed tracking-normal text-right">
-                    צִדֵּד
                 </h1>
             </div>
 
-            <div class="mt-4">
+            <div class="mt-3">
                 <div class="flex items-center justify-between mb-3">
                     <span class="text-sm font-bold text-slate-300">בחר את התשובה הנכונה</span>
                     <span id="round-counter-text" class="text-xs text-slate-400">שאלה 1 מתוך 10</span>
@@ -143,16 +154,16 @@
             </div>
         </main>
 
-        <section id="round-summary-stage" class="hidden my-auto py-6 fade-slide">
+        <section id="round-summary-stage" class="hidden my-auto py-5 fade-slide">
             <div class="rounded-2xl border border-[#2E3856] bg-[#13113C] p-6 sm:p-8 text-center shadow-xl">
                 <div class="w-16 h-16 rounded-full bg-[#18AE79]/20 border border-[#18AE79] text-[#18AE79] flex items-center justify-center text-3xl mx-auto mb-4 font-bold">
                     ✓
                 </div>
                 <h2 id="summary-heading" class="text-2xl font-extrabold text-white mb-2">
-                    סיימת את סיבוב 1!
+                    סיימת את הסיבוב!
                 </h2>
                 <p id="summary-subtext" class="text-sm text-slate-300 mb-6">
-                    המשך כך! כל מילה שאתה עונה עליה נכון מקדמת אותך לשליטה מלאה ביחידה 1.
+                    המשך כך! כל מילה שאתה עונה עליה נכון מקדמת אותך לשליטה מלאה ביחידה.
                 </p>
 
                 <div class="grid grid-cols-3 gap-3 mb-6">
@@ -165,8 +176,8 @@
                         <div id="sum-round-missed" class="text-xl font-extrabold text-[#FF725B]">0</div>
                     </div>
                     <div class="rounded-xl bg-[#0A092D] border border-[#2E3856] p-3">
-                        <div class="text-xs text-slate-400 mb-1">שליטה ביחידה 1</div>
-                        <div id="sum-total-mastered" class="text-xl font-extrabold text-white">0 / 184</div>
+                        <div class="text-xs text-slate-400 mb-1">שליטה ביחידה</div>
+                        <div id="sum-total-mastered" class="text-xl font-extrabold text-white">0 / 0</div>
                     </div>
                 </div>
 
@@ -180,7 +191,7 @@
                         המשך לסיבוב הבא ⬅
                     </button>
                     <button id="restart-unit-btn" class="w-full py-3 rounded-xl border border-[#2E3856] bg-[#0A092D] hover:bg-[#1E1C52] text-slate-200 font-semibold text-sm transition-all">
-                        התחל את יחידה 1 מחדש 🔄
+                        אפס והתחל את היחידה מחדש 🔄
                     </button>
                 </div>
             </div>
@@ -191,7 +202,7 @@
     <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="w-full max-w-md rounded-2xl border border-[#2E3856] bg-[#13113C] p-6 shadow-2xl fade-slide">
             <div class="flex items-center justify-between border-b border-[#2E3856] pb-3 mb-4">
-                <h3 class="text-lg font-bold text-white">הגדרות תרגול — יחידה 1</h3>
+                <h3 id="settings-modal-title" class="text-lg font-bold text-white">הגדרות תרגול — יחידה 1</h3>
                 <button id="close-settings-btn" class="w-8 h-8 rounded-full bg-[#0A092D] border border-[#2E3856] text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold">
                     ✕
                 </button>
@@ -204,14 +215,14 @@
                         <option value="10" selected>10 מילים בסיבוב (מומלץ ללמידה מהירה)</option>
                         <option value="20">20 מילים בסיבוב</option>
                         <option value="30">30 מילים בסיבוב</option>
-                        <option value="184">כל 184 המילים ברצף</option>
+                        <option value="999">כל מילות היחידה ברצף</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 mb-1.5">סינון מילים ביחידה 1</label>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">סינון מילים ביחידה</label>
                     <select id="setting-word-filter" class="w-full rounded-xl bg-[#0A092D] border border-[#2E3856] text-white px-3.5 py-2.5 focus:outline-none focus:border-[#4255FF]">
-                        <option value="all" selected>כל המילים ביחידה 1 (184 ערכים)</option>
+                        <option value="all" selected>כל המילים ביחידה</option>
                         <option value="poly">מילים רב-משמעיות בלבד (2+ פירושים)</option>
                         <option value="single">מילים בעלות פירוש יחיד בלבד</option>
                     </select>
@@ -236,18 +247,18 @@
                     שמור והחל הגדרות
                 </button>
                 <button id="reset-progress-settings-btn" class="px-4 py-3 rounded-xl border border-[#FF725B]/50 text-[#FF725B] hover:bg-[#FF725B]/10 font-bold text-xs transition-all">
-                    אפס התקדמות
+                    אפס יחידה זו
                 </button>
             </div>
         </div>
     </div>
 
     <div id="overview-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="w-full max-w-2xl max-h-[90vh] rounded-2xl border border-[#2E3856] bg-[#13113C] p-5 sm:p-6 shadow-2xl flex flex-col fade-slide">
+        <div class="w-full max-w-2xl max-h-[88vh] rounded-2xl border border-[#2E3856] bg-[#13113C] p-5 sm:p-6 shadow-2xl flex flex-col fade-slide">
             <div class="flex items-center justify-between border-b border-[#2E3856] pb-3 mb-4 shrink-0">
                 <div>
-                    <h3 class="text-lg font-extrabold text-white">יחידה 1 — מילון מלא ומעקב שליטה</h3>
-                    <p class="text-xs text-slate-400">כולל כל 184 הערכים מתוך קובץ קמפוס IL</p>
+                    <h3 id="overview-modal-title" class="text-lg font-extrabold text-white">יחידה 1 — מילון מלא ומעקב שליטה</h3>
+                    <p id="overview-modal-subtitle" class="text-xs text-slate-400">כל הערכים מתוך קובץ קמפוס IL</p>
                 </div>
                 <button id="close-overview-btn" class="w-9 h-9 rounded-full bg-[#0A092D] border border-[#2E3856] text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold">
                     ✕
@@ -256,232 +267,1878 @@
 
             <div class="overflow-y-auto space-y-5 pr-1 flex-grow">
                 <div class="rounded-xl bg-[#0A092D] border border-[#2E3856] p-4">
-                    <div class="text-xs font-bold text-slate-300 mb-2 text-center">התפלגות שליטה במילות יחידה 1</div>
+                    <div id="overview-chart-title" class="text-xs font-bold text-slate-300 mb-2 text-center">התפלגות שליטה במילות יחידה 1</div>
                     <div class="chart-container">
-                        <canvas id="unit1-chart"></canvas>
+                        <canvas id="unit-chart"></canvas>
                     </div>
                 </div>
 
                 <div>
                     <div class="flex flex-col sm:flex-row gap-2 mb-3">
-                        <input id="glossary-search-input" type="text" placeholder="חיפוש מילה או פירוש ביחידה 1..." class="flex-1 rounded-xl bg-[#0A092D] border border-[#2E3856] text-white text-sm px-3.5 py-2 focus:outline-none focus:border-[#4255FF]">
+                        <input id="glossary-search-input" type="text" placeholder="חיפוש מילה או פירוש ביחידה..." class="flex-1 rounded-xl bg-[#0A092D] border border-[#2E3856] text-white text-sm px-3.5 py-2 focus:outline-none focus:border-[#4255FF]">
                         <select id="glossary-type-filter" class="rounded-xl bg-[#0A092D] border border-[#2E3856] text-white text-xs px-3 py-2 focus:outline-none focus:border-[#4255FF]">
-                            <option value="all">הכול (184)</option>
+                            <option value="all">כל מילות היחידה</option>
                             <option value="poly">רב-משמעיות בלבד</option>
                             <option value="mastered">מילים שנלמדו ✓</option>
                             <option value="unmastered">טרם נלמדו</option>
                         </select>
                     </div>
 
-                    <div id="glossary-items-container" class="space-y-2 max-h-72 overflow-y-auto">
+                    <div id="glossary-items-container" class="space-y-2 max-h-64 overflow-y-auto">
                     </div>
                 </div>
             </div>
 
             <div class="mt-4 pt-3 border-t border-[#2E3856] shrink-0">
                 <button id="resume-study-btn" class="w-full py-3 rounded-xl bg-[#4255FF] hover:bg-[#5667FF] text-white font-bold text-sm transition-all">
-                    חזרה לתרגול ביחידה 1 ⬅
+                    חזרה לתרגול ביחידה ⬅
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        const unit1Words = [
-            { id: 1, term: "אָבְנַיִים", meanings: ["מתקן מסתובב להכנת כלי חרס"] },
-            { id: 2, term: "אוֹצֵר", meanings: ["שומר על משהו יקר ערך", "הממונה על המוצגים במוזיאון"] },
-            { id: 3, term: "אָחוּ", meanings: ["כר דשא, שדה מרעה"] },
-            { id: 4, term: "אִיחוּי", meanings: ["חיבור חלקים, הכלבה"] },
-            { id: 5, term: "אִילוּלֵא", meanings: ["אם לא, אלמלא, לולי, לולא"] },
-            { id: 6, term: "אֲלוּמָּה", meanings: ["חבילת שיבולים קצורות", "גלים המשודרים בטווח צר, קרן (אלומת אור - קרן אור)"] },
-            { id: 7, term: "אֲלוּמַּת אוֹר", meanings: ["קרן אור"] },
-            { id: 8, term: "אָמוֹדַאי", meanings: ["צוללן"] },
-            { id: 9, term: "אָמִיר", meanings: ["צמרת, הענפים העליונים בעץ"] },
-            { id: 10, term: "אֲמַתְלָה", meanings: ["תירוץ, סיבה לא אמיתית"] },
-            { id: 11, term: "אָסָם", meanings: ["מחסן תבואה"] },
-            { id: 12, term: "אֶצְבָּעוֹן", meanings: ["כיסוי המהווה הגנה לאצבע בשעת תפירה"] },
-            { id: 13, term: "אֶקְרָן", meanings: ["מסך, מִרְקע"] },
-            { id: 14, term: "אָרִיג", meanings: ["בד"] },
-            { id: 15, term: "אַרְכִיב / אַרְכִיּוֹן", meanings: ["מקום אחסון למסמכים"] },
-            { id: 16, term: "אֲרָעִי", meanings: ["זמני"] },
-            { id: 17, term: "אֶשְׁכּוֹל", meanings: ["מספר פירות או פרחים המחוברים יחדיו לאותו הגבעול", "מספר דברים קטנים המחוברים יחד, חבילה"] },
-            { id: 18, term: "בֵּאוּר", meanings: ["הסבר של נושא לא מובן או ההסבר עצמו, פרשנות"] },
-            { id: 19, term: "בְּגִילּוּפִין", meanings: ["במצב של שכרות קלה, \"בראש טוב\""] },
-            { id: 20, term: "בְּגַפּוֹ", meanings: ["לבדו, ללא בן זוג"] },
-            { id: 21, term: "בּוּרְסְקִי / בּוּרְסְקַאי / בּוּרְסִי", meanings: ["מעבד עורות"] },
-            { id: 22, term: "בּוֹשׁ", meanings: ["התבייש"] },
-            { id: 23, term: "בּוֹשֵׁשׁ", meanings: ["התמהמה בעשיית דבר מה (בושש לבוא - איחר, התעכב)"] },
-            { id: 24, term: "בִּיּוּת", meanings: ["אילוף, הפיכת דבר פראי לביתי", "הנחיית פצצה או טיל אל עבר מטרה"] },
-            { id: 25, term: "בֵּרֵא", meanings: ["כָּרַת, עקר עצים"] },
-            { id: 26, term: "בֵּית בַּד", meanings: ["מקום בו מייצרים שמן מזיתים"] },
-            { id: 27, term: "בֵּית מַרְזֵחַ", meanings: ["בר, פאב, מסבאה"] },
-            { id: 28, term: "בַּלָּן", meanings: ["עובד בבית המרחץ"] },
-            { id: 29, term: "בְּמַפְגִּיעַ", meanings: ["בהתרסה, באופן בוטה", "באופן נמרץ, באסרטיביות, בהחלטיות, בפסקנות"] },
-            { id: 30, term: "בַּעֲלִיל", meanings: ["באופן ברור, ללא ספק"] },
-            { id: 31, term: "בְּפוּמְבִּי / בְּפוּמְבֵּי", meanings: ["באופן גלוי ולעיני כל"] },
-            { id: 32, term: "בָּצִיר", meanings: ["קטיף ענבים"] },
-            { id: 33, term: "בָּצַר", meanings: ["קטף ענבים"] },
-            { id: 34, term: "גָּדָה", meanings: ["שפת הנהר, חוף", "קצה כלי, שפת הכלי (מלא עד גדותיו - מלא עד הסוף, עלה על מידותיו)"] },
-            { id: 35, term: "גָּהַר", meanings: ["התכופף, השתופף"] },
-            { id: 36, term: "גּוּר", meanings: ["הִזָּהֵר"] },
-            { id: 37, term: "גְּזוּזְטְרָה", meanings: ["מרפסת חיצונית (ללא גג)"] },
-            { id: 38, term: "גְּזִיר", meanings: ["חתיכה שנגזרה ממשהו"] },
-            { id: 39, term: "גִּלְעֵן", meanings: ["הוציא את גלעין הפרי"] },
-            { id: 40, term: "גַּרְגְּרָן", meanings: ["אכלן, זללן, להוט אחר אוכל"] },
-            { id: 41, term: "גַּת", meanings: ["מקום המשמש לדריכת ענבים והכנת יין"] },
-            { id: 42, term: "דָּגָה", meanings: ["שם כולל לכל הדגים למיניהם"] },
-            { id: 43, term: "דּוֹבֵב", meanings: ["גרם למישהו אחר לדבר"] },
-            { id: 44, term: "דִּידַקְטִי", meanings: ["שקשור בתחום תורת ההוראה (דידקטיקה - תורת ההוראה)"] },
-            { id: 45, term: "דִּרְבּוּן", meanings: ["עידוד לפעולה מסוימת, המרצה"] },
-            { id: 46, term: "הִבְלִיג", meanings: ["ריסן את עצמו, התאפק", "נמנע מלבטא רגש כלשהו"] },
-            { id: 47, term: "הִגֵּר", meanings: ["עבר מארץ אחת לאחרת והשתקע בה לפרק זמן ממושך"] },
-            { id: 48, term: "הֲדוֹם", meanings: ["שרפרף נמוך, ספסל נמוך שהיושב מניח עליו את רגליו"] },
-            { id: 49, term: "הֶדְיוֹט", meanings: ["נטול ידיעות בתחום מסוים"] },
-            { id: 50, term: "הִטְמִיעַ", meanings: ["ספג, הפנים, גרם למשהו להפוך חלק בלתי נפרד ממשהו אחר"] },
-            { id: 51, term: "הִיפָּה / הִיסָּה", meanings: ["השתיק, השקיט, החריש"] },
-            { id: 52, term: "הִכְבִּיר בְּמִילִים", meanings: ["דיבר רבות באריכות יתרה, האריך בדברים"] },
-            { id: 53, term: "הִכְחִישׁ", meanings: ["טען שמשהו אינו נכון, שלל"] },
-            { id: 54, term: "הַס", meanings: ["מילת ציווי הדורשת שקט"] },
-            { id: 55, term: "הִסְכִּית", meanings: ["שתק והקשיב בריכוז, האזין, הטה אוזן"] },
-            { id: 56, term: "הִסְלִים", meanings: ["החריף, הקצין, הידרדר"] },
-            { id: 57, term: "הִסְמִיךְ", meanings: ["נתן לו סמכות, אישר לו לבצע משהו, ייפה את כוחו", "קֵרֵב, גרם להם להיות סמוכים (קרובים / קשורים)", "הפך משהו לפחות נוזלי"] },
-            { id: 58, term: "הֶעֱלָה אֲרוּכָה", meanings: ["הגליד (ארוכה = גלד, הרקמה הנוצרת תוך כדי תהליך הריפוי של הפצע)"] },
-            { id: 59, term: "הִפְלִיא בּוֹ אֶת מַכּוֹתָיו", meanings: ["הִכָּה אותו"] },
-            { id: 60, term: "הִפְלִיג בְּ-", meanings: ["הִרְבָּה, הפריז, הגזים, עשה משהו בשפע (הפליג בשבחו - שיבח אותו מאוד)"] },
-            { id: 61, term: "הִצְפִּין", meanings: ["נע צפונה", "העלים, החביא"] },
-            { id: 62, term: "הֵקִיץ", meanings: ["התעורר משנתו, נעוֹר"] },
-            { id: 63, term: "הִשְׁחִיז", meanings: ["ליטש וחידד את הלהב"] },
-            { id: 64, term: "הִשְׁתָּאוּת", meanings: ["פליאה"] },
-            { id: 65, term: "הִתְבַּשֵּׂר", meanings: ["קיבל או שמע בשורה (בדרך כלל בשורה טובה)"] },
-            { id: 66, term: "הִתְגּוֹדֵד", meanings: ["התקהל, התאסף"] },
-            { id: 67, term: "הִתְחַלָּה", meanings: ["העמיד פני חולה, התחזה לחולה"] },
-            { id: 68, term: "הִתְחַסֵּד", meanings: ["העמיד פני צדיק"] },
-            { id: 69, term: "הִתִּיר", meanings: ["שחרר (התיר את הקשר - פתח את הקשר)", "אִפְשֵׁר, הסכים, אישר (מהמילה מותר)"] },
-            { id: 70, term: "הִתְכַּתֵּשׁ", meanings: ["נאבק"] },
-            { id: 71, term: "הִתְמוֹגֵג", meanings: ["התענג, נהנה, רווה נחת"] },
-            { id: 72, term: "הִתַּמֵּר", meanings: ["התרומם כלפי מעלה, התנשא"] },
-            { id: 73, term: "הִתְנַבֵּא", meanings: ["השמיע ניבוי או חיזוי כלשהו"] },
-            { id: 74, term: "הִתְנַכֵּר", meanings: ["העמיד פנים כאילו אין לו קשר אליו, התעלם ממנו במכוון"] },
-            { id: 75, term: "הִתְנַצֵּחַ", meanings: ["התווכח"] },
-            { id: 76, term: "הִתְעַמֵּר", meanings: ["התעלל, התאכזר"] },
-            { id: 77, term: "הִתְעַרְטֵל", meanings: ["פשט את בגדיו"] },
-            { id: 78, term: "הִתְרָה", meanings: ["הזהיר"] },
-            { id: 79, term: "הִתְרַצָּה", meanings: ["נענה לבקשה לאחר שכנוע רב, הסכים"] },
-            { id: 80, term: "זַבָּן", meanings: ["מוכר בחנות"] },
-            { id: 81, term: "זֶרֶד", meanings: ["ענף"] },
-            { id: 82, term: "זָרָה מֶלַח עַל הַפְּצָעִים", meanings: ["הוסיף על צערו, דרך לו על היבלות, נגע בעצב רגיש (זרה - פיזר)"] },
-            { id: 83, term: "חָס", meanings: ["ריחם"] },
-            { id: 84, term: "חֲרִי (אַף)", meanings: ["כעס, חמה, זעם"] },
-            { id: 85, term: "חָרִישׁ", meanings: ["ביתור האדמה במחרשה כדי שתהיה נוחה לזריעה", "העונה שחורשים ומפלחים בה את האדמה"] },
-            { id: 86, term: "חֲרִישִׁי", meanings: ["שָׁקֶט"] },
-            { id: 87, term: "חָרַךְ", meanings: ["שרף קלות באש, צרב", "חריץ או חור בקיר"] },
-            { id: 88, term: "טָוָה", meanings: ["חיבר, צירף", "שָׁזַר, יצר חוטים מחומר גולמי"] },
-            { id: 89, term: "טְלַאי", meanings: ["חתיכת בד שתופרים על בגד לצורך תיקון קרע"] },
-            { id: 90, term: "טְרָשִׁים", meanings: ["אדמה סלעית שקשה לעבד"] },
-            { id: 91, term: "יָגֵעַ", meanings: ["עייף מרוב עבודה, תשוש"] },
-            { id: 92, term: "יָד רוֹחֶצֶת יָד", meanings: ["אחד עוזר לשני, שמור לי ואשמור לך (בדרך כלל בהקשר שלילי)"] },
-            { id: 93, term: "יְקִיצָה", meanings: ["התעוררות משינה, חוסר שינה, ערנות"] },
-            { id: 94, term: "יַרְכָתַיִים", meanings: ["החלק האחורי של הספינה"] },
-            { id: 95, term: "כְּבַד לָשׁוֹן / פֶּה", meanings: ["מגמגם, מתקשה בדיבור"] },
-            { id: 96, term: "כִּיחֵד", meanings: ["הסתיר, העלים, לא גילה את כל האמת, שיקר"] },
-            { id: 97, term: "כִּילָּה", meanings: ["סיים, גמר", "רשת שפורשים מעל למיטה להגן על השוכבים בה מיתושים וזבובים", "השמיד, חיסל"] },
-            { id: 98, term: "כֵּן / כַּנָּה", meanings: ["בסיס שעליו מעמידים דבר כלשהו"] },
-            { id: 99, term: "כְּסָיָה", meanings: ["כפפה"] },
-            { id: 100, term: "כְּרַךְ", meanings: ["עיר גדולה"] },
-            { id: 101, term: "לֵאוּת", meanings: ["יגעות, עייפות, תשישות"] },
-            { id: 102, term: "לְדִידוֹ", meanings: ["מבחינתו, מצידו, לדעתו"] },
-            { id: 103, term: "לַהַג", meanings: ["פטפוט, ריבוי דברים בלא טעם"] },
-            { id: 104, term: "לַהֲגָן", meanings: ["פטפטן, שמדבר בלי סוף"] },
-            { id: 105, term: "לוּלֵא", meanings: ["אם לא"] },
-            { id: 106, term: "לִיבָּה", meanings: ["החלק המרכזי והחשוב ביותר במשהו, גרעין", "החלק הפנימי של הפרי בו מרוכזים הזרעים", "הגדיל את הלהבה", "הגביר, הסעיר"] },
-            { id: 107, term: "לִיטֵשׁ", meanings: ["נתן מראה חלק או מבריק באמצעות שפשוף/החלקה", "שיפר, עיבד, עשה \"פִינִיש\""] },
-            { id: 108, term: "לִמְגִינַת לִבּוֹ", meanings: ["לצערו, למורת רוחו"] },
-            { id: 109, term: "מַאֲכֶלֶת", meanings: ["סכין לשחיטה, חַלֶף"] },
-            { id: 110, term: "מֵאֵן", meanings: ["לא הסכים, התנגד, סרב"] },
-            { id: 111, term: "מְבוּסָם", meanings: ["שיכור קלות, שתוי"] },
-            { id: 112, term: "מַגָּל", meanings: ["כלי עבודה לקצירת תבואה (עשוי מסכין בצורת חצי ירח)"] },
-            { id: 113, term: "מָהוּהַּ", meanings: ["בלוי, מרופט, שחוק"] },
-            { id: 114, term: "מַזְמֵרָה", meanings: ["כלי גינה המשמש לקיצוץ הענפים"] },
-            { id: 115, term: "מִכְמוֹרֶת", meanings: ["רשת גדולה המשמשת בעיקר לדייג, מצודה (רשת דייגים)"] },
-            { id: 116, term: "מֵלִיץ יוֹשֶׁר", meanings: ["סנגור, מי שטוען לזכותו של מישהו"] },
-            { id: 117, term: "מָסִיק", meanings: ["קטיף זיתים, עונת קטיף הזיתים"] },
-            { id: 118, term: "מִסְעָד", meanings: ["תמיכה, משענת"] },
-            { id: 119, term: "מַפַּח נֶפֶשׁ", meanings: ["אכזבה גדולה"] },
-            { id: 120, term: "מִצְנֶפֶת", meanings: ["כובע בד, מגבעת"] },
-            { id: 121, term: "מִרְבָּץ", meanings: ["רובד קרקע שמצויים בו מחצבים (מרבץ יהלומים - אזור בו יש יהלומים רבים לכרייה)"] },
-            { id: 122, term: "מְשׁוּנָן", meanings: ["בעל שיניים או בעל צורה של שיניים"] },
-            { id: 123, term: "מְתַאֲבֵן", meanings: ["מאכל המוגש בתחילת הארוחה על-מנת להגביר את התיאבון"] },
-            { id: 124, term: "נִגַּף", meanings: ["הובס, נוצח"] },
-            { id: 125, term: "נֶגֶף", meanings: ["מחלה קשה המפילה חללים רבים", "תקלה, מכשול (אֶבֶן נֶגֶף - מכשול)"] },
-            { id: 126, term: "נָדָן", meanings: ["נרתיק החרב"] },
-            { id: 127, term: "נָהִיר", meanings: ["ברור, מובן"] },
-            { id: 128, term: "נֶהֶנְתָן", meanings: ["רודף תענוגות"] },
-            { id: 129, term: "נוֹטֵר", meanings: ["שומר, מאבטח"] },
-            { id: 130, term: "נוֹטֵר טִינָה", meanings: ["לא סולח, שומר כעס"] },
-            { id: 131, term: "נוּל", meanings: ["מכונת אריגה"] },
-            { id: 132, term: "נְחִיל", meanings: ["להקת חרקים"] },
-            { id: 133, term: "נֶחָמָה פּוּרְתָּא", meanings: ["נחמה כלשהי, נחמה מועטה"] },
-            { id: 134, term: "נַחְשׁוֹל", meanings: ["גל גדול"] },
-            { id: 135, term: "נִטְמַע", meanings: ["נקלט והפך לחלק מקבוצה מסוימת, נבלע"] },
-            { id: 136, term: "נִיחָא", meanings: ["מילא, אין דבר"] },
-            { id: 137, term: "נִחַם", meanings: ["התחרט על מה שעשה, הצטער"] },
-            { id: 138, term: "נִיפָה", meanings: ["סינן, ניקה, ברר"] },
-            { id: 139, term: "נִכּוּשׁ", meanings: ["עקירת עשבים שוטים"] },
-            { id: 140, term: "נִכְלָם", meanings: ["מבויש, בוש (בּוֹשׁ וְנִכְלָם - הִתְבַּיֵּשׁ מאוד), כלימה = בושה"] },
-            { id: 141, term: "נֶעְתַּר", meanings: ["הסכים, השיב בחיוב"] },
-            { id: 142, term: "נִפְעָם", meanings: ["נרגש"] },
-            { id: 143, term: "נִקְוָוה", meanings: ["זרם והצטבר במקום כלשהו"] },
-            { id: 144, term: "נִרְגָּן", meanings: ["רוטן ומתלונן כל עת"] },
-            { id: 145, term: "נִרְפָּה", meanings: ["עצלן, רשלן"] },
-            { id: 146, term: "סַבָּר", meanings: ["סבל בנמל"] },
-            { id: 147, term: "סוֹרֵר", meanings: ["מרדן, סרבן, חסר משמעת"] },
-            { id: 148, term: "סַיָּיס", meanings: ["עובד המטפל בסוסים"] },
-            { id: 149, term: "סִיקֵל", meanings: ["פינה אבנים, ניקה את השטח מאבנים"] },
-            { id: 150, term: "סָנֵגוֹר", meanings: ["עורך דין המגן על הנאשם"] },
-            { id: 151, term: "סִתֵּת", meanings: ["הקציע והחליק אבנים"] },
-            { id: 152, term: "סַתָּת", meanings: ["מחליק ומהקצע אבנים, בעל מקצוע שמסתת אבנים"] },
-            { id: 153, term: "עִילֵּג", meanings: ["מדבר בצורה לא ברורה, כבד דיבור"] },
-            { id: 154, term: "עַלְוָוה", meanings: ["כלל העלים המכסים את העץ"] },
-            { id: 155, term: "עָמַד מִנֶּגֶד / מִן הַצַּד", meanings: ["לא התערב"] },
-            { id: 156, term: "עָרֵב", meanings: ["מי שמתחייב לפרוע חוב של אחר והיה והאחר לא יעמוד בהתחייבויותיו", "נעים לשמיעה (נאמר גם על אוכל: ערב לחך - טעים)"] },
-            { id: 157, term: "פִּיר", meanings: ["חור, בור (פיר המעלית - ה\"שרוול\" בו עוברת המעלית)"] },
-            { id: 158, term: "פָּלָה", meanings: ["הוציא כינים (מהשיער, מהפרווה וכדומה)"] },
-            { id: 159, term: "פָּמַלְיָה", meanings: ["בני-לוויה"] },
-            { id: 160, term: "פֶּרֶא", meanings: ["חמור הבר", "חסר תרבות"] },
-            { id: 161, term: "צִדֵּד", meanings: ["הפנה דבר מה הצידה, הטה", "הביט מן הצד, הביט מזווית בעין", "תמך ב-, דגל ב-"] },
-            { id: 162, term: "קוֹרֶט / קַרְטוֹב", meanings: ["מעט, כמות קטנה"] },
-            { id: 163, term: "קוּשְׁיָה", meanings: ["שאלה, בעיה, חידה"] },
-            { id: 164, term: "קוֹשֵׁשׁ", meanings: ["אסף עצים או קש למדורה"] },
-            { id: 165, term: "קִיטוֹן", meanings: ["חדר קטן, חדר שינה"] },
-            { id: 166, term: "קָמַל", meanings: ["נבל (להיפך: לבלב)"] },
-            { id: 167, term: "קְרִיסָה", meanings: ["התמוטטות, הרס"] },
-            { id: 168, term: "קְרִישָׁה", meanings: ["התעבות של נוזל והפיכתו לסמיך וקרוש"] },
-            { id: 169, term: "קָשַׁר (לוֹ) כְּתָרִים", meanings: ["שיבח אותו מאוד"] },
-            { id: 170, term: "קַת", meanings: ["החלק האחורי של הנשק שבא במגע עם הכתף, ידית"] },
-            { id: 171, term: "רָדָה", meanings: ["אסף דבש מהכוורת", "שלט ביד רמה, משל"] },
-            { id: 172, term: "רָוָוה", meanings: ["שתה עד שלא הרגיש צמא יותר"] },
-            { id: 173, term: "רָקִיק", meanings: ["מאפה שטוח ודק, עוגיה שטוחה"] },
-            { id: 174, term: "רֶשֶׁף", meanings: ["הבזק אש, גחלת, ניצוץ"] },
-            { id: 175, term: "רָשַׁף", meanings: ["התיז רשפים או ניצוצות. בהשאלה: כעס, נמלא חימה ותוכחה"] },
-            { id: 176, term: "שָׁאוֹן", meanings: ["קול, המולה, רעש"] },
-            { id: 177, term: "שְׁאַט נֶפֶשׁ", meanings: ["תחושת סלידה (שאט - בוז)"] },
-            { id: 178, term: "שׁוֹקֵק (חַיִּים)", meanings: ["מלא אנשים, פעילות מרובה"] },
-            { id: 179, term: "שִׁיסָּה", meanings: ["גרם למישהו לתקוף אחר, הסית"] },
-            { id: 180, term: "שָׁכִיחַ", meanings: ["נפוץ, מצוי (להיפך: נדיר)"] },
-            { id: 181, term: "שָׁכַךְ", meanings: ["נרגע, שקט, דמם"] },
-            { id: 182, term: "שָׁלָה", meanings: ["הוציא מתוך נוזל"] },
-            { id: 183, term: "שַׁמַּאי", meanings: ["מי שתפקידו להעריך את שווי הנכס"] },
-            { id: 184, term: "תֶּלֶם", meanings: ["החריץ שנוצר בעת חרישת האדמה"] }
-        ];
+        const rawUnitsData = {
+            1: [
+                ["אָבְנַיִים","מתקן מסתובב להכנת כלי חרס"],
+                ["אוֹצֵר","שומר על משהו יקר ערך","הממונה על המוצגים במוזיאון"],
+                ["אָחוּ","כר דשא, שדה מרעה"],
+                ["אִיחוּי","חיבור חלקים, הכלבה"],
+                ["אִילוּלֵא","אם לא, אלמלא, לולי, לולא"],
+                ["אֲלוּמָּה","חבילת שיבולים קצורות","גלים המשודרים בטווח צר, קרן (אלומת אור - קרן אור)"],
+                ["אֲלוּמַּת אוֹר","קרן אור"],
+                ["אָמוֹדַאי","צוללן"],
+                ["אָמִיר","צמרת, הענפים העליונים בעץ"],
+                ["אֲמַתְלָה","תירוץ, סיבה לא אמיתית"],
+                ["אָסָם","מחסן תבואה"],
+                ["אֶצְבָּעוֹן","כיסוי המהווה הגנה לאצבע בשעת תפירה"],
+                ["אֶקְרָן","מסך, מִרְקע"],
+                ["אָרִיג","בד"],
+                ["אַרְכִיב / אַרְכִיּוֹן","מקום אחסון למסמכים"],
+                ["אֲרָעִי","זמני"],
+                ["אֶשְׁכּוֹל","מספר פירות או פרחים המחוברים יחדיו לאותו הגבעול","מספר דברים קטנים המחוברים יחד, חבילה"],
+                ["בֵּאוּר","הסבר של נושא לא מובן או ההסבר עצמו, פרשנות"],
+                ["בְּגִילּוּפִין","במצב של שכרות קלה, \"בראש טוב\""],
+                ["בְּגַפּוֹ","לבדו, ללא בן זוג"],
+                ["בּוּרְסְקִי / בּוּרְסְקַאי / בּוּרְסִי","מעבד עורות"],
+                ["בּוֹשׁ","התבייש"],
+                ["בּוֹשֵׁשׁ","התמהמה בעשיית דבר מה (בושש לבוא - איחר, התעכב)"],
+                ["בִּיּוּת","אילוף, הפיכת דבר פראי לביתי","הנחיית פצצה או טיל אל עבר מטרה"],
+                ["בֵּרֵא","כָּרַת, עקר עצים"],
+                ["בֵּית בַּד","מקום בו מייצרים שמן מזיתים"],
+                ["בֵּית מַרְזֵחַ","בר, פאב, מסבאה"],
+                ["בַּלָּן","עובד בבית המרחץ"],
+                ["בְּמַפְגִּיעַ","בהתרסה, באופן בוטה","באופן נמרץ, באסרטיביות, בהחלטיות, בפסקנות"],
+                ["בַּעֲלִיל","באופן ברור, ללא ספק"],
+                ["בְּפוּמְבִּי / בְּפוּמְבֵּי","באופן גלוי ולעיני כל"],
+                ["בָּצִיר","קטיף ענבים"],
+                ["בָּצַר","קטף ענבים"],
+                ["גָּדָה","שפת הנהר, חוף","קצה כלי, שפת הכלי (מלא עד גדותיו - מלא עד הסוף, עלה על מידותיו)"],
+                ["גָּהַר","התכופף, השתופף"],
+                ["גּוּר","הִזָּהֵר"],
+                ["גְּזוּזְטְרָה","מרפסת חיצונית (ללא גג)"],
+                ["גְּזִיר","חתיכה שנגזרה ממשהו"],
+                ["גִּלְעֵן","הוציא את גלעין הפרי"],
+                ["גַּרְגְּרָן","אכלן, זללן, להוט אחר אוכל"],
+                ["גַּת","מקום המשמש לדריכת ענבים והכנת יין"],
+                ["דָּגָה","שם כולל לכל הדגים למיניהם"],
+                ["דּוֹבֵב","גרם למישהו אחר לדבר"],
+                ["דִּידַקְטִי","שקשור בתחום תורת ההוראה (דידקטיקה - תורת ההוראה)"],
+                ["דִּרְבּוּן","עידוד לפעולה מסוימת, המרצה"],
+                ["הִבְלִיג","ריסן את עצמו, התאפק","נמנע מלבטא רגש כלשהו"],
+                ["הִגֵּר","עבר מארץ אחת לאחרת והשתקע בה לפרק זמן ממושך"],
+                ["הֲדוֹם","שרפרף נמוך, ספסל נמוך שהיושב מניח עליו את רגליו"],
+                ["הֶדְיוֹט","נטול ידיעות בתחום מסוים"],
+                ["הִטְמִיעַ","ספג, הפנים, גרם למשהו להפוך חלק בלתי נפרד ממשהו אחר"],
+                ["הִיפָּה / הִיסָּה","השתיק, השקיט, החריש"],
+                ["הִכְבִּיר בְּמִילִים","דיבר רבות באריכות יתרה, האריך בדברים"],
+                ["הִכְחִישׁ","טען שמשהו אינו נכון, שלל"],
+                ["הַס","מילת ציווי הדורשת שקט"],
+                ["הִסְכִּית","שתק והקשיב בריכוז, האזין, הטה אוזן"],
+                ["הִסְלִים","החריף, הקצין, הידרדר"],
+                ["הִסְמִיךְ","נתן לו סמכות, אישר לו לבצע משהו, ייפה את כוחו","קֵרֵב, גרם להם להיות סמוכים (קרובים / קשורים)","הפך משהו לפחות נוזלי"],
+                ["הֶעֱלָה אֲרוּכָה","הגליד (ארוכה = גלד, הרקמה הנוצרת תוך כדי תהליך הריפוי של הפצע)"],
+                ["הִפְלִיא בּוֹ אֶת מַכּוֹתָיו","הִכָּה אותו"],
+                ["הִפְלִיג בְּ-","הִרְבָּה, הפריז, הגזים, עשה משהו בשפע (הפליג בשבחו - שיבח אותו מאוד)"],
+                ["הִצְפִּין","נע צפונה","העלים, החביא"],
+                ["הֵקִיץ","התעורר משנתו, נעוֹר"],
+                ["הִשְׁחִיז","ליטש וחידד את הלהב"],
+                ["הִשְׁתָּאוּת","פליאה"],
+                ["הִתְבַּשֵּׂר","קיבל או שמע בשורה (בדרך כלל בשורה טובה)"],
+                ["הִתְגּוֹדֵד","התקהל, התאסף"],
+                ["הִתְחַלָּה","העמיד פני חולה, התחזה לחולה"],
+                ["הִתְחַסֵּד","העמיד פני צדיק"],
+                ["הִתִּיר","שחרר (התיר את הקשר - פתח את הקשר)","אִפְשֵׁר, הסכים, אישר (מהמילה מותר)"],
+                ["הִתְכַּתֵּשׁ","נאבק"],
+                ["הִתְמוֹגֵג","התענג, נהנה, רווה נחת"],
+                ["הִתַּמֵּר","התרומם כלפי מעלה, התנשא"],
+                ["הִתְנַבֵּא","השמיע ניבוי או חיזוי כלשהו"],
+                ["הִתְנַכֵּר","העמיד פנים כאילו אין לו קשר אליו, התעלם ממנו במכוון"],
+                ["הִתְנַצֵּחַ","התווכח"],
+                ["הִתְעַמֵּר","התעלל, התאכזר"],
+                ["הִתְעַרְטֵל","פשט את בגדיו"],
+                ["הִתְרָה","הזהיר"],
+                ["הִתְרַצָּה","נענה לבקשה לאחר שכנוע רב, הסכים"],
+                ["זַבָּן","מוכר בחנות"],
+                ["זֶרֶד","ענף"],
+                ["זָרָה מֶלַח עַל הַפְּצָעִים","הוסיף על צערו, דרך לו על היבלות, נגע בעצב רגיש (זרה - פיזר)"],
+                ["חָס","ריחם"],
+                ["חֲרִי (אַף)","כעס, חמה, זעם"],
+                ["חָרִישׁ","ביתור האדמה במחרשה כדי שתהיה נוחה לזריעה","העונה שחורשים ומפלחים בה את האדמה"],
+                ["חֲרִישִׁי","שָׁקֶט"],
+                ["חָרַךְ","שרף קלות באש, צרב","חריץ או חור בקיר"],
+                ["טָוָה","חיבר, צירף","שָׁזַר, יצר חוטים מחומר גולמי"],
+                ["טְלַאי","חתיכת בד שתופרים על בגד לצורך תיקון קרע"],
+                ["טְרָשִׁים","אדמה סלעית שקשה לעבד"],
+                ["יָגֵעַ","עייף מרוב עבודה, תשוש"],
+                ["יָד רוֹחֶצֶת יָד","אחד עוזר לשני, שמור לי ואשמור לך (בדרך כלל בהקשר שלילי)"],
+                ["יְקִיצָה","התעוררות משינה, חוסר שינה, ערנות"],
+                ["יַרְכָתַיִים","החלק האחורי של הספינה"],
+                ["כְּבַד לָשׁוֹן / פֶּה","מגמגם, מתקשה בדיבור"],
+                ["כִּיחֵד","הסתיר, העלים, לא גילה את כל האמת, שיקר"],
+                ["כִּילָּה","סיים, גמר","רשת שפורשים מעל למיטה להגן על השוכבים בה מיתושים וזבובים","השמיד, חיסל"],
+                ["כֵּן / כַּנָּה","בסיס שעליו מעמידים דבר כלשהו"],
+                ["כְּסָיָה","כפפה"],
+                ["כְּרַךְ","עיר גדולה"],
+                ["לֵאוּת","יגעות, עייפות, תשישות"],
+                ["לְדִידוֹ","מבחינתו, מצידו, לדעתו"],
+                ["לַהַג","פטפוט, ריבוי דברים בלא טעם"],
+                ["לַהֲגָן","פטפטן, שמדבר בלי סוף"],
+                ["לוּלֵא","אם לא"],
+                ["לִיבָּה","החלק המרכזי והחשוב ביותר במשהו, גרעין","החלק הפנימי של הפרי בו מרוכזים הזרעים","הגדיל את הלהבה","הגביר, הסעיר"],
+                ["לִיטֵשׁ","נתן מראה חלק או מבריק באמצעות שפשוף/החלקה","שיפר, עיבד, עשה \"פִינִיש\""],
+                ["לִמְגִינַת לִבּוֹ","לצערו, למורת רוחו"],
+                ["מַאֲכֶלֶת","סכין לשחיטה, חַלֶף"],
+                ["מֵאֵן","לא הסכים, התנגד, סרב"],
+                ["מְבוּסָם","שיכור קלות, שתוי"],
+                ["מַגָּל","כלי עבודה לקצירת תבואה (עשוי מסכין בצורת חצי ירח)"],
+                ["מָהוּהַּ","בלוי, מרופט, שחוק"],
+                ["מַזְמֵרָה","כלי גינה המשמש לקיצוץ הענפים"],
+                ["מִכְמוֹרֶת","רשת גדולה המשמשת בעיקר לדייג, מצודה (רשת דייגים)"],
+                ["מֵלִיץ יוֹשֶׁר","סנגור, מי שטוען לזכותו של מישהו"],
+                ["מָסִיק","קטיף זיתים, עונת קטיף הזיתים"],
+                ["מִסְעָד","תמיכה, משענת"],
+                ["מַפַּח נֶפֶשׁ","אכזבה גדולה"],
+                ["מִצְנֶפֶת","כובע בד, מגבעת"],
+                ["מִרְבָּץ","רובד קרקע שמצויים בו מחצבים (מרבץ יהלומים - אזור בו יש יהלומים רבים לכרייה)"],
+                ["מְשׁוּנָן","בעל שיניים או בעל צורה של שיניים"],
+                ["מְתַאֲבֵן","מאכל המוגש בתחילת הארוחה על-מנת להגביר את התיאבון"],
+                ["נִגַּף","הובס, נוצח"],
+                ["נֶגֶף","מחלה קשה המפילה חללים רבים","תקלה, מכשול (אֶבֶן נֶגֶף - מכשול)"],
+                ["נָדָן","נרתיק החרב"],
+                ["נָהִיר","ברור, מובן"],
+                ["נֶהֶנְתָן","רודף תענוגות"],
+                ["נוֹטֵר","שומר, מאבטח"],
+                ["נוֹטֵר טִינָה","לא סולח, שומר כעס"],
+                ["נוּל","מכונת אריגה"],
+                ["נְחִיל","להקת חרקים"],
+                ["נֶחָמָה פּוּרְתָּא","נחמה כלשהי, נחמה מועטה"],
+                ["נַחְשׁוֹל","גל גדול"],
+                ["נִטְמַע","נקלט והפך לחלק מקבוצה מסוימת, נבלע"],
+                ["נִיחָא","מילא, אין דבר"],
+                ["נִחַם","התחרט על מה שעשה, הצטער"],
+                ["נִיפָה","סינן, ניקה, ברר"],
+                ["נִכּוּשׁ","עקירת עשבים שוטים"],
+                ["נִכְלָם","מבויש, בוש (בּוֹשׁ וְנִכְלָם - הִתְבַּיֵּשׁ מאוד), כלימה = בושה"],
+                ["נֶעְתַּר","הסכים, השיב בחיוב"],
+                ["נִפְעָם","נרגש"],
+                ["נִקְוָוה","זרם והצטבר במקום כלשהו"],
+                ["נִרְגָּן","רוטן ומתלונן כל עת"],
+                ["נִרְפָּה","עצלן, רשלן"],
+                ["סַבָּר","סבל בנמל"],
+                ["סוֹרֵר","מרדן, סרבן, חסר משמעת"],
+                ["סַיָּיס","עובד המטפל בסוסים"],
+                ["סִיקֵל","פינה אבנים, ניקה את השטח מאבנים"],
+                ["סָנֵגוֹר","עורך דין המגן על הנאשם"],
+                ["סִתֵּת","הקציע והחליק אבנים"],
+                ["סַתָּת","מחליק ומהקצע אבנים, בעל מקצוע שמסתת אבנים"],
+                ["עִילֵּג","מדבר בצורה לא ברורה, כבד דיבור"],
+                ["עַלְוָוה","כלל העלים המכסים את העץ"],
+                ["עָמַד מִנֶּגֶד / מִן הַצַּד","לא התערב"],
+                ["עָרֵב","מי שמתחייב לפרוע חוב של אחר והיה והאחר לא יעמוד בהתחייבויותיו","נעים לשמיעה (נאמר גם על אוכל: ערב לחך - טעים)"],
+                ["פִּיר","חור, בור (פיר המעלית - ה\"שרוול\" בו עוברת המעלית)"],
+                ["פָּלָה","הוציא כינים (מהשיער, מהפרווה וכדומה)"],
+                ["פָּמַלְיָה","בני-לוויה"],
+                ["פֶּרֶא","חמור הבר","חסר תרבות"],
+                ["צִדֵּד","הפנה דבר מה הצידה, הטה","הביט מן הצד, הביט מזווית בעין","תמך ב-, דגל ב-"],
+                ["קוֹרֶט / קַרְטוֹב","מעט, כמות קטנה"],
+                ["קוּשְׁיָה","שאלה, בעיה, חידה"],
+                ["קוֹשֵׁשׁ","אסף עצים או קש למדורה"],
+                ["קִיטוֹן","חדר קטן, חדר שינה"],
+                ["קָמַל","נבל (להיפך: לבלב)"],
+                ["קְרִיסָה","התמוטטות, הרס"],
+                ["קְרִישָׁה","התעבות של נוזל והפיכתו לסמיך וקרוש"],
+                ["קָשַׁר (לוֹ) כְּתָרִים","שיבח אותו מאוד"],
+                ["קַת","החלק האחורי של הנשק שבא במגע עם הכתף, ידית"],
+                ["רָדָה","אסף דבש מהכוורת","שלט ביד רמה, משל"],
+                ["רָוָוה","שתה עד שלא הרגיש צמא יותר"],
+                ["רָקִיק","מאפה שטוח ודק, עוגיה שטוחה"],
+                ["רֶשֶׁף","הבזק אש, גחלת, ניצוץ"],
+                ["רָשַׁף","התיז רשפים או ניצוצות. בהשאלה: כעס, נמלא חימה ותוכחה"],
+                ["שָׁאוֹן","קול, המולה, רעש"],
+                ["שְׁאַט נֶפֶשׁ","תחושת סלידה (שאט - בוז)"],
+                ["שׁוֹקֵק (חַיִּים)","מלא אנשים, פעילות מרובה"],
+                ["שִׁיסָּה","גרם למישהו לתקוף אחר, הסית"],
+                ["שָׁכִיחַ","נפוץ, מצוי (להיפך: נדיר)"],
+                ["שָׁכַךְ","נרגע, שקט, דמם"],
+                ["שָׁלָה","הוציא מתוך נוזל"],
+                ["שַׁמַּאי","מי שתפקידו להעריך את שווי הנכס"],
+                ["תֶּלֶם","החריץ שנוצר בעת חרישת האדמה"]
+            ],
+            2: [
+                ["אֶדֶן","המדף בתחתית החלון"],
+                ["אֲדָנִית","עציץ מוארך המונח בדרך-כלל על אדן החלון"],
+                ["אִסְפְּלָנִית","תחבושת, פלסטר, אגד מדבק"],
+                ["אֵפוֹא","אם כך, ובכן"],
+                ["אֶצְעָדָה","צמיד לרגל או ליד"],
+                ["אֲרוּכָה","גֶּלֶד, שכבת הבשר הבריא העולה על פצע מבריא (העלה ארוכה, הגליד)"],
+                ["אֶרֶךְ אַפַּיִים","אדם סבלני שאינו ממהר לכעוס"],
+                ["אָרַע","קרה"],
+                ["אַשְׁפָּה","נרתיק לחיצים"],
+                ["בְּדִימוֹס","שהשתחרר או פרש מעבודתו או תפקידו"],
+                ["בּוֹסֶר","פרי לא בשל","דבר שעדיין אינו בשל, אינו מוכן"],
+                ["בּוֹצֵר","מי שעובד בבציר (קטיף ענבים)"],
+                ["בִּיּוֹגְרַפְיָה","תאור תולדותיו של אדם מסוים"],
+                ["בַּלָאט","בשקט, בחשאי","בסתר, בחדרי חדרים, בהחבא"],
+                ["בְּעֶטְיוֹ","בעצתו (הרעה), בשל מזימתו, באשמתו, (עטי = עצה רעה)"],
+                ["בָּצִיר","הענבים עצמם"],
+                ["בְּרֹאשׁ חוּצוֹת","בפומבי, בפרהסיה"],
+                ["בָּרִי","ברור, ודאי, ידוע"],
+                ["בְּרֵישׁ גְּלֵי","לעיני כל"],
+                ["בַּר-מִינָן","מת, מנוח"],
+                ["בָּרַר","בחר את מה שמתאים ביותר, סינן"],
+                ["גָּדַשׁ","מילא עד אפס מקום"],
+                ["גָּדַשׁ אֶת הַסְּאָה","הגזים, הפריז, עבר את הגבול (סאה - מידת נפח עתיקה)"],
+                ["גֵּז","צמר שנגזז מהצאן","פעולת הגזיזה של הצמר"],
+                ["גָּז","נעלם, נמוג, חלף"],
+                ["גְּזֵרָה","פקודה או חוק של איסור כלשהו, פסק דין, תקנה, הוראה"],
+                ["גַּיְא","שקע צר בין הרים"],
+                ["גִּיל / גִּילָה","שמחה, ששון, אושר"],
+                ["גַּלְעִין","גרעין הפרי, ליבה, חרצן"],
+                ["גְּמִילָה","הבשלת הפרי","השתחררות מהרגל מזיק"],
+                ["גַּנְזַךְ","ארכיב, ארכיון, מקום לאכסון מסמכים (לרוב ממשלתי)"],
+                ["גַּפַּיִים","שם כולל לרגלים והידיים של בני אדם ובעלי חיים"],
+                ["גָּרַע","החסיר"],
+                ["דָּלָה","שאב, הוציא מהמים (דָּלָה פנינים). בהשאלה: הוציא משהו לאחר חיפוש (לדלות מידע)"],
+                ["דָּלַק","רדף (אחרי מישהו)","בער"],
+                ["דָּרוּךְ","מוכן לפעולה, ערני, קשוב","מתוח, משוך"],
+                ["הֶאֱמִיר","עלה, התייקר"],
+                ["הִבְלִיחַ","הבהב באור חלש ובלתי יציב, נצנץ"],
+                ["הִגְדִּישׁ אֶת הַסְּאָה","הגזים, הפריז, עבר את הגבול (סאה - מידת נפח עתיקה)"],
+                ["הֵגִיף","סגר, נעל, הבריח"],
+                ["הִדְבִּיר","ריסס נגד מזיקים"],
+                ["הִדִּיר רַגְלָיו","נמנע מלבקר, הגיע לעתים רחוקות"],
+                ["הִדִּיר שֵׁינָה מֵעֵינָיו","גרם לדאגה","לא נרדם"],
+                ["הֵהִין","העז"],
+                ["הוֹכִיחַ","הראה ראיות לנכונותו ואמיתותו של דבר מה, אימת","נזף, הטיף לו מוסר"],
+                ["הוֹקִיר רַגְלָיו","נמנע מלבקר, הגיע לעתים רחוקות"],
+                ["הִזְדַּכְּכוּת","הפיכה לנקי וצלול, התנקות","השתחררות מחטאים או רגשות שליליים, זיכוך הנפש"],
+                ["הִטְלִיא","תיקן קרע בבגד על ידי טלאי"],
+                ["הִטְמִיעַ","החדיר מערכת חדשה (למשל מערכת מחשב) לארגון כלשהו"],
+                ["הִכְמִין","הניח במקום מסתור, החביא, הסתיר"],
+                ["הָלַם","הכה, הקיש, דפק"],
+                ["הֵפִיס דַּעְתּוֹ","ריצה או הרגיע אותו, השכין שלום"],
+                ["הִשְׁכִּין","נתן מקום מגורים, יישב, אכלס","השליט, השרה (אווירה, שלום וכו')"],
+                ["הִשְׁתּוֹקֵק","רצה מאוד"],
+                ["הִתְחַבֵּט","התלבט"],
+                ["הִתְחַסֵּד","נהג ברחמנות"],
+                ["הִתְמַקֵּחַ","ניהל משא ומתן על מחירו של דבר או על תנאים בעסקה, בחוזה וכדומה"],
+                ["הִתְעַרְטֵל","חשף את רגשותיו הכמוסים"],
+                ["הִתְפַּעֵם","התרגש מרוב פליאה, החסיר פעימה, התרשם"],
+                ["הִתְקַהֵל","התאסף, התקבץ לקהל"],
+                ["זְמוֹרָה","ענף, זרד"],
+                ["זָמַר","קצץ ענפים (מַזְמֵרָה - מספרים מיוחדים לקיצוץ ענפים, זמוֹרָה - ענף של גפן)"],
+                ["חָבוּט","מוכה, נחבט","מעוך, שחבטו בו. בהשאלה: נדוש, נושא שדנו בו רבות, חסר חידוש"],
+                ["חִלְחוּל","הסתננות","חדירה של מים וירידתם למעמקים"],
+                ["חַמְשִׁיר","שיר היתולי, עוקצני וקצר המורכב מחמש שורות (חמש ושיר)"],
+                ["חָרִיט","ארנק"],
+                ["חָרַץ לָשׁוֹן","התחצף, חירף וגידף, השמיע דברים קשים (גם הוציא לשון)"],
+                ["חָתָה","גרף, אסף והעביר (לרוב גחלים) (מַחְתָּה - כלי לטיפול בגחלים)"],
+                ["טָבַע","חקק צורה כלשהי בתוך חומר","יצר מטבע"],
+                ["יָרַד לְסוֹף דַּעְתּוֹ","הבין את כוונתו בדיוק"],
+                ["יֵשׁ בְּלִבּוֹ עָלָיו","לא סלח"],
+                ["כַּבִּיר","גדול, עצום, רב, אדיר"],
+                ["כֶּבֶשׁ","מישור משופע (משמש לחיבור בין מקומות בעלי גבהים שונים, כבש המטוס, כבש הספינה וכד')"],
+                ["כָּבַשׁ","הקסים","סלל דרך","לחיצה, דחיסה, הידוק","התאפק, הבליג","שימר מזון"],
+                ["כִּבְשָׁן","תנור להתכת מתכות וחימום חומרים שונים, כור"],
+                ["כַּחַשׁ","שֶׁקֶר, כַּזָב"],
+                ["כִּיבֵּד","טאטא, ניקה"],
+                ["כֵּרָה","סעודה, משתה, ארוחה חגיגית"],
+                ["כָּרָה","הוציא מחצבים מהקרקע, חפר, חצב"],
+                ["כִּתְמוֹל שִׁלְשׁוֹם","כמו תמיד, כמו שהיה עד עכשיו, כרגיל"],
+                ["לֹא שְׁזָפַתּוּ עַיִן","לא נראה על ידי איש, היה חבוי ומוסתר מעיני כול"],
+                ["לִבֵּן","בירר סוגיה לעומק, דן בפרטים עד שהבין והגיע למסקנה / לפתרון","חימם מתכת באש חזקה (עד שצבעה הפך לבן)"],
+                ["לַהַק","קבוצת מטוסים","קבוצה של בעלי חיים, להקה"],
+                ["לָקוֹנִי","קצר, תמציתי, ענייני"],
+                ["מָאוּס","דוחה, מגעיל, בזוי"],
+                ["מוּמָר","מי שהמיר את דתו"],
+                ["מוּסַר כְּלָיוֹת","רגשי אשם, חרטה"],
+                ["מָחָה","השמיד, השכיח, מחק","התנגד, הביע מחאה","ניגב (מחה דמעה)"],
+                ["מֶחֱוָה","תנועה סמלית עם אחד מאיברי הגוף","מעשה בלתי מחייב שנועד להראות על רצון טוב וידידות"],
+                ["מְטוּלָּא","מתוקן בטלאי, שניתן עליו טלאי במקום הקרע"],
+                ["מִכְמוֹנֶת","מלכודת, פח יקוש"],
+                ["מִכְמָן","מטמון, אוצר"],
+                ["מִכְמַנִּים","סודות"],
+                ["מְפוֹרָז","שאין בו כוחות צבאיים"],
+                ["מְצוּעֲצָע","מקושט ומעוטר בחוסר טעם ובצורה מוגזמת, קיטש"],
+                ["מֵצֵר","מצטער על משהו"],
+                ["מְרוּבָּב","מוכתם, מלוכלך"],
+                ["מִרְקָם","הרכב של חומר","מארג, אופי שנובע מההרכב"],
+                ["מָשָׁה","הוציא מתוך המים"],
+                ["מְשׂוּרָה","במידה מצומצמת, מעט מאוד","כלי למדידת נוזלים"],
+                ["מָשַׁל בְּרוּחוֹ","ריסן את עצמו, התאפק"],
+                ["נוֹחַ לִכְעוֹס","מתעצבן מהר, מהיר חמה"],
+                ["נִחַם","התנחם"],
+                ["נִישָׂא","הושמע, נאמר","רם, גבוה","הורם, הונף"],
+                ["נָמוֹג","מפוחד מאוד, מבוהל","נעלם בהדרגה, התפוגג"],
+                ["נְקִיק","חריץ בסלע או בהר, סדק"],
+                ["נֵתַח","חתיכת בשר","חלק מהשלם, פרוסה"],
+                ["סָבָא","שתה לשוכרה (מסבאה - פאב)"],
+                ["סַגְפָן","אדם שמענה את עצמו, מתנזר מהנאות החיים"],
+                ["סוּגָר","כלוב"],
+                ["סֶכֶר","מחסום בפני זרם מים של נהר או תעלה שניתן להרימו ולהורידו לפי הצורך"],
+                ["סָכַר אֶת פִּיו","סתם לו את הפה, החריש"],
+                ["סָרִיג","אריג סרוג דמוי רשת","מתקן לייבוש כלים","שבכה, מחיצת רשת"],
+                ["סָתוּם","לא ברור, לא מובן, מעורפל"],
+                ["עִיבּוּי","תהליך הפיכת גז לנוזל","הפיכת דבר לעבה, צפוף או סמיך יותר משהיה"],
+                ["עֲדִי","תכשיט"],
+                ["עַל נְקַלָּה","בקלות, ללא מאמץ"],
+                ["עָלוּם","מוסתר, חסוי","בלתי מוסבר, לא מובן"],
+                ["עֱלִי","חלק ממערכת הרביה של צמחים","מכשיר שצורתו גליל המשמש לכתישה"],
+                ["עִנְבָּל","לשון הפעמון","רצועת הבשר הקטנה התלויה בחלל הלוע מעל ללשון"],
+                ["עָנֵף","מסועף, בעל הרבה שלוחות","שיש לו ענפים רבים"],
+                ["עָסִיסִי","רענן, מעניין","מלא מיץ"],
+                ["עֲשָׁשִׁית","מנורת נפט"],
+                ["פָּדָה","הציל, שיחרר, חילץ","שילם כסף תמורת החפץ הממושכן"],
+                ["פּוּזְמָק","גרב"],
+                ["פּוּמִית","פִיָּה"],
+                ["פִּיטוּם","האכלת מופרזת"],
+                ["פִּיֵּיס","הרגיע מישהו והשכיח את כעסו על ידי בקשת סליחה, פיצוי וכו'","השכין שלום בין שני צדדים"],
+                ["פִּיק בִּרְכַּיִים","רעידת הברכיים מפחד או מחולשה"],
+                ["פֶּלֶג","חלק מהשלם (לרוב במשמעות חצי)","נחל טבעי קטן, ערוץ","חלק מקבוצה שחבריו החליטו להיפרד ממנה"],
+                ["פָּרַע","הרס, בזז","החזיר חוב"],
+                ["פָּשָׂה","התפשט, התרחב, נפוץ (משמש במיוחד לתיאור תופעות שליליות או מזיקות)"],
+                ["פִּשְׁפָּשׁ","דלת קטנה, שער קטן"],
+                ["פֶּתִי","מי שמאמין לכל מה שאומרים לו"],
+                ["צְדוּדִית","פרופיל, מראה דמותו של אדם או עצם מן הצד"],
+                ["צוֹהַר","חלון קטן, אשנב"],
+                ["קוּבְלָנָה","תלונה, טענה"],
+                ["קוּלְמוֹס","עט, נוצה לרישום"],
+                ["קוֹף הַמַּחַט","החור במחט דרכו משחילים את החוט, חריר המחט"],
+                ["קוֹרַת רוּחַ","שביעות רצון, נחת (להיפך: מורת רוח)"],
+                ["קֶסֶת","כלי לדיו"],
+                ["קָפַץ","סגר בחוזקה איבר כלשהו (שפתיים, אגרוף)"],
+                ["קָפַץ אֶת יָדוֹ","סרב לתת"],
+                ["קָרוּא","מי שהוזמן"],
+                ["קְשֵׁה עוֹרֶף","עקשן"],
+                ["רַאַוְותָן","אוהב להראות את עצמו ולהרשים אחרים (מציג עצמו כאילו היה חלון ראווה)"],
+                ["רֶגֶב","גוש עפר"],
+                ["רְדִיד","צעיף"],
+                ["רוֹבֶד","שכבה"],
+                ["רָווּי","מלא, עמוס","מלא בנוזלים, ששתה מספיק, שהשקו אותו דיו"],
+                ["רֶכֶס","שרשרת הרים או גבעות"],
+                ["רָפֶה","חלש ומדולדל, רופס"],
+                ["רִפְיוֹן יָדַיִם","ייאוש"],
+                ["רִפְיוֹן רוּחַ","ייאוש","חולשה נפשית, חוסר אונים"],
+                ["רִתְמָה","מערכת רצועות המשמשת לקשירת הבהמה, אפסר, רסן"],
+                ["שְׁבָב","חלק קטן במחשב (צ'יפ)","רסיס עץ או מתכת הניתז בעת עיבודם"],
+                ["שַׁבְשֶׁבֶת","מתקן המשמש לזיהוי כיוון הרוח"],
+                ["שִׁגָּעוֹן גַּדְלוּת","סוג של הפרעה נפשית שהלוקה בה חושב שהוא אישיות חשובה ובעלת כוחות מיוחדים"],
+                ["שְׁדֵמָה","שדה תבואה או כרם"],
+                ["שׁוֹקֶת","מיכל מים דמוי אמבטיה המשמש להשקיית בהמות (בִּפְנֵי שׁוֹקֶת שְׁבוּרָה - במצב של חוסר אונים)"],
+                ["שִׁיסּוּי","הסתה לתקיפה, חירחור"],
+                ["שָׁלַט בְּרוּחוֹ","ריסן את עצמו, התאפק"],
+                ["שִׁעֲרוּךְ","הערכת שווי מחדש"],
+                ["שִׁרְבּוּט","ציור ללא משמעות, \"קשקוש\""],
+                ["תָּאֵב","רוצה מאוד, משתוקק (תאב בצע - רודף כסף)"],
+                ["תַּגְרָן","רוכל בשוק, סוחר","כינוי למי שמרבה להתווכח על המחיר"],
+                ["תּוֹחֶלֶת חַיִּים","משך הזמן שאדם (או מכשיר או ארגון) צפויים להתקיים"],
+                ["תְּלוּלִית","ערימה קטנה, תלולית"]
+            ],
+            3: [
+                ["אֲבוּקָה","לפיד, צרור קיסמים בוערים"],
+                ["אֶבֶן מַשְׁחֶזֶת","אבן המשמשת להשחזה ושינון של כלי חיתוך חדים"],
+                ["אֶגֶד","תחבושת לפצע, פלסטר (אגד מדבק)","חבילה","יחידה צבאית גדולה"],
+                ["אֵגֶל","רסיס, טיפה של נוזל (טל, זיעה, דמעה וכדומה)"],
+                ["אָהִיל","כיסוי למנורה"],
+                ["אוֹבְּיֶקְטִיבִי","ענייני, שאינו מושפע מדעות או העדפות אישיות"],
+                ["אוּמְדָן","הערכה של גודל"],
+                ["אוֹרְחָה","שיירה של בעלי חיים או רוכבים (בדרך כלל של גמלים)"],
+                ["אוֹרְלוֹגִין","שעון קיר גדול"],
+                ["אָחוּז אֵימָה","מפוחד מאוד"],
+                ["אָכַף","כפה על קיום חוק, תקנה, פסק דין"],
+                ["אָנִין","בעל טעם מעודן ורגיש, בררן"],
+                ["אָפִיק","נחל, ערוץ, נהר","מסלול, נתיב, כיוון"],
+                ["אָפַס","לא נשאר ממנו דבר, תם, נגמר"],
+                ["בָּא עַל שְׂכָרוֹ","קיבל את מה שמגיע לו על מעשיו הטובים, תוגמל"],
+                ["בּוֹסֵס","הלך לאט ובצעדים כבדים, בדרך כלל באדמה טובענית, בבוץ, בשלג וכדומה"],
+                ["בָּזַק","פיזר"],
+                ["בָּזָק","מהיר מאוד, מפתיע"],
+                ["בְּחַדְרֵי חֲדָרִים","בצורה לא גלויה, בסתר"],
+                ["בִּיעוּת","פחד גדול, מורא, אימה"],
+                ["בִּיעָף","במהירות"],
+                ["בֵּית מֶרְחָץ","מקום ציבורי שניתן להתרחץ ולהתקלח בו"],
+                ["בַּר","תבואה, גרגרי תבואה ללא השיבולים","בן","חוץ, הצד החיצון (אין תוכו כברו - אין פנימיותו כחיצוניותו)","לא מתורבת, פראי","נקי, טהור","ראוי ל-, בעל... (בר-סמכא - בעל סמכות)"],
+                ["בְּרִיּוֹת","שם כולל לבעלי החיים (כולל בני אדם)"],
+                ["בְּרִיחַ","אחד החלקים בנשק קל","קורה מעץ או ברזל המשמשת לנעילת השער"],
+                ["בַּר-שְׁפִיטָה","מי שניתן לשפוט אותו"],
+                ["בְּשׁוֹגֵג","לא בכוונה, בטעות, שלא במתכוון, בלא יודעין"],
+                ["גּוֹרֶן","מקום בו דשים את התבואה (מפרידים את הגרגרים מהשיבולים)"],
+                ["גָּחַן","התכופף, שח, גהר"],
+                ["גַּלָּב","סַפָּר, אדם שמקצועו לספר אנשים ולגלחם"],
+                ["גַּמְלוֹנִי","גדול, ארוך, מגושם, חסר קואורדינציה, מסורבל (גמלוני - כמו גמל)"],
+                ["גָּנַז","העביר מסמכים לארכיב לשם אחסון"],
+                ["גֵּץ","ניצוץ"],
+                ["גֶּשֶׁם זַלְעָפוֹת","גשם חזק, מבול"],
+                ["דוּמָם","בשקט, בדממה"],
+                ["דִּידָה","צלע, הלך תוך קפיצות קלות ותנועות מצד לצד"],
+                ["דָּלִיל","מימי, נוזלי","לא מרוכז, לא דחוס, מפוזר"],
+                ["דִּמְעוֹת תַּנִּין","דמעות שווא המוזלות רק למראית עין, השתתפות בצער הזולת כלפי חוץ בלבד"],
+                ["דֶּשֶׁן","חומר כימי שמוסיפים לאדמה לצורך השבחתה לגידול צמחים"],
+                ["הִדִּיחַ","הסית למעשה שלילי"],
+                ["הַדְרָן","קטע נוסף לאחר סיום הופעה, לאור בקשת הקהל"],
+                ["הוֹגִיעַ","עייף"],
+                ["הִזְלִיף","התיז נוזל, טפטף"],
+                ["הִטִּיל אֶת חִתּוֹ / חִתָּתוֹ","הפחיד אותו מאוד, הרתיע"],
+                ["הִטִּיל מוֹרָא","הפחיד מאוד"],
+                ["הִלְאִים","העביר לבעלות הכלל, הפקיע מבעלות פרטית לבעלות לאומית (להיפך: הפריט)"],
+                ["הָלַךְ רָכִיל","ריכל"],
+                ["הָלַךְ שְׁבִי","התפתה אחרי דבר מה שהתברר כשקר ומרמה, הלך שולל","התאהב במישהו או משהו לחלוטין והיה מוכן לעשות הכול למענו"],
+                ["הָלַךְ שׁוֹלֵל","האמין לדבר שהתברר כמוטעה, רומה"],
+                ["הִלְעִיט","האכיל יותר מידי"],
+                ["הֵמִיר","החליף דבר אחד בשני"],
+                ["הֵמֵס","חימם מוצק עד שהפך לנוזל"],
+                ["הֵסֵב","התיישב לשולחן"],
+                ["הֶעְפִּיל","עלה על מקום גבוה, טיפס","התקדם בתפקיד או מעמד"],
+                ["הִפְצִיר","ביקש שוב ושוב, התחנן"],
+                ["הִפְקִיעַ","לקח דבר מה מבעליו בעזרת צו משפטי או בתוקף חוקי אחר","העלה דבר מעבר למקובל (הפקעת מחירים - העלאה מופרזת של מחירים מעבר למחיר המקובל)"],
+                ["הֵפֵר","לא קיים","הפסיק, השבית"],
+                ["הִצְטַנֵּף","התכרבל בתנוחה עוברית"],
+                ["הֵקִיץ הַקֵּץ","הגיע הסוף למשהו, תם"],
+                ["הִקְנִיט","הרגיז מישהו על ידי לעג, עקיצה"],
+                ["הִרְעִיף","העניק דברים טובים (כמו מחמאות) בנדיבות וברוחב לב","הזיל, התיז"],
+                ["הִרְפָּה","הפסיק להחזיק בו, הפסיק להטריד או להציק"],
+                ["הִשִּׂיא עֵצָה","ייעץ"],
+                ["הִשְׁרָה","שם משהו בתוך נוזל, טבל (והשאיר בתוך הנוזל)"],
+                ["הִשְׁתַּיֵּר","נשאר, נותר"],
+                ["הִשְׁתַּעְבֵּד","השקיע את כל זמנו ומרצו במשהו תוך זניחת דברים אחרים","קיבל בהכנעה את מרותו של מישהו, דוכא","התמכר"],
+                ["הִתְאַבֵּק בַּעֲפַר רַגְלָיו","הפך לתלמידו"],
+                ["הִתִּיךְ","העביר חומר ממצב מוצק למצב נוזל"],
+                ["הִתְיַיתֵּר","חשב וטען שהוא יכול לעשות משהו שמעבר ליכולתו"],
+                ["הִתְלַקֵּחַ","התפרץ, התעורר והתחזק (על יֵצֶר, רגש וכד')","נדלק, התחיל לבעור","התלהט, התפשט (על ריב, קטטה וכד')"],
+                ["הִתְעַשֵּׁת","חזר לשלוט במצב, התארגן מחדש, יצא ממצב של בלבול"],
+                ["הִתְפִּיל","הפך לתפל, הפך מי ים למי שתיה"],
+                ["הִתְקַנֵּא","התחיל לקנא"],
+                ["הִתְרַבְרֵב","התגאה, השתחצן, \"השוויץ\""],
+                ["הִתְרַעֵם","כעס, התרגז, התמרמר"],
+                ["זַאטוּט","ילד קטן, תינוק"],
+                ["זְחוּחַ","מי שהתנהגותו היא שילוב של שביעות רצון מוגזמת וגאוותנות"],
+                ["זִיקוּק","טיהור, ניקוי"],
+                ["זַךְ","נקי, טהור, צלול"],
+                ["זִיכּוּךְ","טיהור"],
+                ["זָרָה","פיזר, הפיץ (כמו בביטוי - זרה מלח על הפצעים)"],
+                ["זָרָה אֲבָק / חוֹל בָּעֵינַיִים","הונה, ניסה להסתיר את העובדות"],
+                ["חוֹשֶׁךְ מִצְרַיִם","אפלה כבדה, חושך מוחלט (מכת החושך במצרים)"],
+                ["חַיִץ","סוג של גדר המשמש להפרדה, מחיצה"],
+                ["חִישֵּׁל","חיזק והקשיח מבחינה פיזית או נפשית"],
+                ["חֲפִיר","תעלה חפורה באדמה מסביב לחומת העיר או מסביב למבצר"],
+                ["חֵרֵף נַפְשׁוֹ","סיכן את חייו בשביל משהו שהאמין בו"],
+                ["חֶרְפָּה","בושה"],
+                ["חֶשְׁבּוֹנִיָּה","מכשיר לביצוע פעולות פשוטות של חיבור וחיסור (מורכב משורות חרוזים שאפשר להזיזם מצד לצד)"],
+                ["חַתְרָנוּת","לחתור תחת מישהו, פעילות שמטרתה לערער מבפנים את הסדר הקיים"],
+                ["טָחוּב","רטוב, לח"],
+                ["טָמַן רֹאשׁוֹ בַּחוֹל","התעלם מהמציאות החמורה"],
+                ["טֶרָסָה","מדרגה שנבנית במדרון ההר כדי למנוע סחף אדמה"],
+                ["יָהִיר","גאוותן, רברבן"],
+                ["יְחִידֵי סְגוּלָה","אנשים שמצטיינים בתחום פעולתם, משכמם ומעלה"],
+                ["יְלוּדָה","כלל התינוקות שנולדו בזמן/במקום מסוים (ההפך מתמותה)"],
+                ["יָצָא מִכֵּלָיו","התפרץ בכעס עד ששכח את עצמו, התרתח ביותר"],
+                ["יֶקֶב","המקום שבו מייצרים יין"],
+                ["יְקַר הַמְּצִיאוּת","נדיר, שאין רבים כמותו"],
+                ["יְשִׁימוֹן","מדבר, שממה"],
+                ["יָשִׁישׁ","זקן, קשיש"],
+                ["כִּיכָּר","יחידת משקל עתיקה"],
+                ["כָּלִיל","לגמרי, לחלוטין, עד תום"],
+                ["כְּלִימָה","בושה"],
+                ["כָּמוּשׁ","מצומק, בלה, נובל"],
+                ["לְבָנָה","ירח, המאור הקטן"],
+                ["לְמוֹתָר","מיותר"],
+                ["מְבוֹאָר","מפורש, מוסבר"],
+                ["מַגְבִּית","גביית כספים בצורה מאורגנת למטרה ציבורית כלשהי"],
+                ["מַהְבִּיל","מעלה אדים, רותח"],
+                ["מָהַל","ערבב נוזלים, הקטין את הריכוז על ידי הוספת מים"],
+                ["מֵזַח","רציף הנכנס אל תוך הים ואליו קושרים את הסירות"],
+                ["מֵחוּשִׁים","כאבים"],
+                ["מַחֲלוֹקֶת","מריבה, חילוקי דעות"],
+                ["מַחְלָצוֹת","בגדים מפוארים, לבוש מהודר"],
+                ["מַטְפֶּה","מיכל לכיבוי אש, מַטָּף"],
+                ["מֵי תְּהוֹם","מי גשמים המצטברים מתחת לאדמה ומשמשים מקור למעיינות ולבארות"],
+                ["מְיוּעָר","מכוסה יער"],
+                ["מַכּוֹשׁ","כלי עבודה חקלאי דמוי מעדר"],
+                ["מִנְיָן","עשרה יהודים לפחות הדרושים בכדי לקיים תפילה"],
+                ["מַעֲגָן","נמל, מרינה, מפרץ קטן המשמש לעגינת כלי שיט"],
+                ["מָעַל","עשה שימוש בכספים או ברכוש שהובטח בידו למטרות רווח אישיות, שלח יד לכסף"],
+                ["מִפְתָּן","סף, החלק התחתון בכניסה"],
+                ["מַקְצֵרָה","מכונה חקלאית המשמשת לקצירת יבולי דגנים"],
+                ["מַרְבָד","שטיח, שכבה, רובד"],
+                ["מִשְׁעֶנֶת קָנֶה רָצוּץ","דבר או אדם שאין לסמוך עליו"],
+                ["מַתְבֵּן","מחסן תבן, אסם"],
+                ["נָא","צלוי למחצה, מבושל למחצה"],
+                ["נִבְצַר מִמֶּנּוּ","נמנע ממנו דבר מה"],
+                ["נְהִירָה","הגעה של הרבה אנשים למקום מסוים"],
+                ["נוּגֶה","עצוב"],
+                ["נָטָה חֶסֶד","עזר לו והתייחס אליו ברוך, סייע"],
+                ["נִים וְלֹא נִים","בין שינה לערות, שינה קלה מאוד"],
+                ["נֵכָר","ארץ זרה ומרוחקת, חוץ לארץ"],
+                ["נִלְאֶה","עייף, תשוש"],
+                ["נְמוּךְ רוּחַ","צנוע, עניו"],
+                ["נָצַר אֶת לְשׁוֹנוֹ / פִּיו","השתתק, לא הוציא הגה"],
+                ["נִקְבָּה","מחילה, מנהרה"],
+                ["נַקְבּוּבִית","נקב קטן מאוד, חור זעיר"],
+                ["סָבוּךְ","מסובך מאוד (על בעיה), סמיך ועבות (על יער)"],
+                ["סוֹכֵךְ","כיסה לצורך הגנה"],
+                ["סִיכֵּל","ביטל, הכשיל דבר מה"],
+                ["סָר חִינוֹ","הפסיק למצוא חן בעיני מישהו (החן שלו זז)"],
+                ["סָתוּר","לא מסודר, פרוע"],
+                ["עָבִיט","כלי קיבול למי שפכים, סיר לילה"],
+                ["עֶגְלוֹן","מי שנוהג בעגלה רתומה לסוסים"],
+                ["עוֹל","כלי רתמה לבהמות עבודה, שני מוטות המחוברים ביתדות לעורף הבהמה"],
+                ["עִישֵּׂב","הוציא (בידיים) עשבים שוטים (ניכוש - הוצאת עשבים בעזרת מכּוֹש)"],
+                ["עַל רֶגֶל אַחַת","בצורה קצרה ומתומצתת, ביעף"],
+                ["עָלַב","העליב, פגע"],
+                ["עָמַד עַל טִיבוֹ","חקר את אופיו של משהו וגיבש את דעתו עליו, תהה על קנקנו"],
+                ["עֲקַלְקָל","שאינו ישר, מפותל"],
+                ["עֲרוּגָה","תלולית אדמה מוארכת בה זורעים זרעים או שותלים שתילים בגינה"],
+                ["פּוֹרֶה","שמניב הרבה פרי, שנותן תפוקה גדולה, יעיל"],
+                ["פְּלָצוּר","חבל ארוך עם לולאה בקצה המשמש את הבוקר ללכידת סוסים, לָאסוֹ"],
+                ["פְּתַלְתַּל","שאינו ישר, מפותל","הפכפך, ערמומי","מסובך להבנה, מורכב"],
+                ["צִי","קבוצת אוניות בעלות ייעוד משותף"],
+                ["צִיר","מיץ, רוטב","שליח, מיופה כוח, מעין שגריר"],
+                ["צְנִים","טוסט, קלי"],
+                ["קוֹצֶר רוּחַ","חוסר (קצר ב) סבלנות"],
+                ["קִידָּה","השתחוויה קלה"],
+                ["קֶלַח","פרי התירס","קלח תירס, אשכול התירס שבו מצויים הגרגרים","זרם, שטף"],
+                ["קְלִישָׁאָה / קְלִישָׁה","רעיון נדוש ושחוק שכבר הועלה פעמים רבות בעבר והספיק לאבד מעוצמתו"],
+                ["קָמִין","תנור, אח"],
+                ["קִנְטֵר","הרגיז, לגלג"],
+                ["קְשֵׁה לֵב","חסר רחמים, אכזרי"],
+                ["קְשֵׁה עוֹרֶף","חצוף, חסר בושה, גס רוח, עקשן"],
+                ["רוֹחַב יָד / לֵב","נדיבות"],
+                ["רִיפָה אֶת יָדָיו","החליש אותו מורלית (ההיפך מעודד אותו), ייאש אותו"],
+                ["שְׂבָכָה","מחיצת רשת, גדר"],
+                ["שַׁבְרִיר","חלק קטן ביותר, קצת"],
+                ["שׁוֹבָךְ","קן יונים בצורת תיבה"],
+                ["שָׁחוּק","נדוש, שדוף (כשנאמר על רעיון)","בלוי ומשומש, מרופט","עייף נפשית, מותש וחסר כוח"],
+                ["שִׁחֵת","השחית, הרס, חיבל"],
+                ["שַׁחַת","תבואה"],
+                ["שִׁידֵּל","פיתה, ניסה לשכנע מישהו לעשות משהו בניגוד לרצונו ההתחלתי"],
+                ["שִׁיכּוּךְ","ריכוך, הרגעה (משככי כאבים)"],
+                ["שִׁכְתּוּב","כתיבת חומר כלשהו בשנית בניסוח או סגנון טוב יותר"],
+                ["שִׁלְהֵי","סוף, סיום, בשלבים האחרונים"],
+                ["שָׁלַח יָד בְּנַפְשׁוֹ","התאבד, טָרַף נפש בכפו"],
+                ["שִׂמְחָה לְאֵיד","שמחה על כשלונו של מישהו"],
+                ["שָׁפָל","נבזה, מנוול","נמוך, קטן (שפל רוח - צנוע, רוחו \"קטנה\")"],
+                ["שַׁרְלְטָן","נוכל, רמאי"],
+                ["תֶּבֶן","סוג של קש המשמש כמאכל בהמות"],
+                ["תָּדִיר","שכיח, קורה לעתים קרובות (תדיר - בתדירות גבוהה) (להיפך: נדיר)"],
+                ["תִּיעוּב","סלידה, מאיסה"],
+                ["תַּסְמִין","סימפטום, סימן היכר"],
+                ["תִּפְרַחַת","מספר פרחים המחוברים יחדיו לאותו הגבעול, אשכול"],
+                ["תַּתְרָן","נטול חוש ריח. בהשאלה: חסר חוש הבחנה"]
+            ],
+            4: [
+                ["אֶבְרָה","כנף של עוף"],
+                ["אַדְוָה","גל קטן"],
+                ["אִוְושָׁה","רחש קל, רשרוש"],
+                ["אָזְלַת יָד","חוסר אונים, חולשה, חוסר יכולת לבצע דבר מה"],
+                ["אֲחִיזַת עֵינַיִים","תרמית, הטעיה, הולכת שולל"],
+                ["אֵיכָה?","איך? הכיצד?"],
+                ["אִיכּוּל","קורוזיה, הרס מתכת עקב התרכבות עם חמצן"],
+                ["אִימוּם","תבנית בצורת כף רגל או גוף בעזרתה מייצרים נעליים או בגדים"],
+                ["אֵימְתָנִי","מפחיד, מאיים, מבהיל"],
+                ["אֵיפָה וְאֵיפָה","אפליה, יחס לא שווה לשני אנשים שונים"],
+                ["אֵיתָן","חזק ויציב, חסון"],
+                ["אֵיתָן בְּדַעְתּוֹ","עומד על דעתו, דבק בעמדתו, משוכנע בצדקתו"],
+                ["אָמַד","העריך"],
+                ["אַמַּת מַיִם","תעלה המשמשת להעברת מים ממקום למקום"],
+                ["אֲנָקָה","צעקה (לרוב כתוצאה מצער או כאב), גניחה"],
+                ["אֲפַרְכֶּסֶת","החלק העליון בשפופרת הטלפון שאותו מצמידים לאוזן"],
+                ["אִצְטַבָּה","מדף, רף"],
+                ["אַרְכָּה","הארכת זמן, תוספת זמן"],
+                ["בְּדִיעֲבַד","לאחר מעשה"],
+                ["בּוּר","שדה לא מעובד שלא נחרש או נזרע"],
+                ["בּוּר (וְעַם הָאָרֶץ)","חסר השכלה, אנאלפבית"],
+                ["בֵּיבָר","גן-חיות"],
+                ["בְּכִי תַּמְרוּרִים","בכי מר על אסון, התייפחות"],
+                ["בָּכֶר","גמל צעיר"],
+                ["בִּמְשׂוּרָה","כמות קטנה ומצומצמת (לקוח מהביטוי \"מים במשורה\")"],
+                ["בָּעֲרָה חֲמָתוֹ","זעם, כעס, רגז"],
+                ["בַּר-כִּבּוּשׁ","שאפשר לכבוש אותו"],
+                ["גֵּאוּת","עליית מפלס מי הים"],
+                ["גִּיבֵּב","אסף חפצים שונים וערם אותם בערימה, שם דברים זה על גבי זה ללא סדר"],
+                ["גָּדִיד","קטיף תמרים"],
+                ["גּוּמְחָה","שֶׁקֶע בקיר"],
+                ["גִּידֵּף","קִילֵּל"],
+                ["גַּלְעֵד","יד, אנדרטה, מצבה"],
+                ["דָּווּי","מיוסר, כואב, מעונה"],
+                ["דִּכְדּוּךְ","דיכאון, עצב, מועקה נפשית"],
+                ["דַּשׁ","קפל בבגד"],
+                ["דָּשׁ בַּעֲקֵבָיו","מזלזל"],
+                ["הֵאִיץ","הוסיף מהירות, זירז"],
+                ["הִגְלָה","גירש מישהו ממולדתו"],
+                ["הִדְלִיף","גילה למישהו דבר שהיה אמור להישאר חסוי"],
+                ["הוֹנָה","רימה, הטעה"],
+                ["הוּעַם","הפך לקהה, טושטש, עורפל"],
+                ["הֶחְטִיא","גרם למישהו לבצע חטא"],
+                ["הִיקָּווּת","היאספות של מים במקום מסוים (מקווה מים)"],
+                ["הִלְבִּין פָּנִים","בייש, העליב"],
+                ["הָלַךְ עִמּוֹ בְּקֶרִי","פעל נגדו, פעל באופן שיעצבן אותו, \"עשה לו דווקא\""],
+                ["הֲלָצָה","בדיחה"],
+                ["הֵנִיא","גרם לו לא לעשות את שתכנן, מנע בעדו"],
+                ["הִסְבִּיר פָּנִים","האיר פנים, התנהג בצורה נחמדה"],
+                ["הִסְתּוֹדֵד","התלחש עם מישהו"],
+                ["הֶעְתִּיר","העניק בנדיבות וברוחב לב"],
+                ["הִצְנִיעַ","הניח דבר מה כך שלא יבלוט, החביא, הסתיר"],
+                ["הֵצֵר צְעָדָיו","הגביל, הפריע לו ומנע את התקדמותו"],
+                ["הִקְשָׁה אֶת לִיבּוֹ / עָרְפּוֹ","התעקש, לא ויתר, המשיך לסרב"],
+                ["הֶרֶף עַיִן","פרק זמן קצר מאוד, רגע"],
+                ["הִשְׁתַּנֵּק","התקשה לבלוע או לדבר בגלל התרגשות שמנעה מעבר תקין של האוויר, נחנק"],
+                ["הִתְוַודַּע","ערך היכרות עם מישהו/משהו חדש, הכיר לראשונה"],
+                ["הִתְפַּלֵּשׁ","התגלגל בעפר או בלכלוך"],
+                ["הִתְרַפֵּס","התחנף למישהו, לחך את עפר רגליו"],
+                ["זָלַג","נטף, נזלו ממנו טיפות","זרם במקום בלתי רצוי"],
+                ["זָעוּם","מעט מאוד"],
+                ["זַרְזִיף","זרם דק"],
+                ["חַבּוּרָה","סימן כחול / נפיחות כתוצאה ממכה"],
+                ["חוּצוֹת","שטחים פתוחים, רחובות"],
+                ["חִיבּוּץ","תהליך הכנת החמאה והשמנת"],
+                ["חַלּוּק נַחַל","אבן חלקה שנשחקה על ידי זרימת מים"],
+                ["חֶנְוָונִי","בעל מכולת"],
+                ["חַרְטוֹם","החלק הקדמי של חפץ כלשהו, כלי שייט/טייס, בעל-חיים"],
+                ["חָשׁ","הרגיש","הזדרז, מיהר, נחפז, נבהל, נזעק, אצה לו השעה"],
+                ["חֲתִימַת שָׂפָם","ראשית צמיחתו של השפם"],
+                ["טָמִיר","נסתר, סודי, בלתי מוכר"],
+                ["טַף","שם כולל לילדים קטנים/תינוקות"],
+                ["טַרְחָן","טרדן, נודניק, אדם שמטריח אחרים"],
+                ["יְבָבָה","יללה, בכי ממושך או מקוטע (על פי רוב לא חזק)"],
+                ["יְדִיד נֶפֶשׁ","חבר נפש, חבר טוב"],
+                ["יִילּוֹד","תינוק רך (בשבועות הראשונים לחייו)"],
+                ["יָצוּעַ","מיטה, משכב, כלי מיטה שמציעים לשכיבה"],
+                ["יָרֵא","פוחד, מבועת"],
+                ["יָרַד לַטִּמְיוֹן","הלך לאיבוד, אבד (משמש בהתייחסות לדבר שקרה לאחר כישלון)"],
+                ["יְשׁוּעָה","הצלה"],
+                ["כּוֹנֵן","ייסד, הקים"],
+                ["כִּחְכּוּחַ","השמעת קול חיכוך בגרון"],
+                ["כִּיסוּפִים","געגועים, השתוקקות"],
+                ["כְּלָיָה","חיסול, השמדה"],
+                ["כְּמִיהָה","השתוקקות"],
+                ["כְּרוֹנוֹלוֹגִי","ערוך בסדר זמנים עוקב"],
+                ["כִּיתֵּת אֶת רַגְלָיו","הלך הרבה"],
+                ["לַהַב","החלק החד של כלי חיתוך, סכין, פגיון, חרב"],
+                ["לָקָה","חלה במשהו, נפל למשכב"],
+                ["מְאוּבָּן","דבר שנתקשה כאבן","נדהם, משותק"],
+                ["מְבוֹאָה","לובי, אולם כניסה"],
+                ["מַהֲתַלָּה","שובבות, מעשה קונדסות"],
+                ["מְזָוֶוה","ארון או חלל קטן המיועד לאחסון מוצרי מזון"],
+                ["מְחִית","מאכל עשוי מפירות או ירקות מעוכים, פירה"],
+                ["מָחַל","סלח"],
+                ["מַחְצָב","חומר שחוצבים מן האדמה כגון: אבנים, פחם, מתכת וכו'"],
+                ["מַחְצָבָה","מקום בו חוצבים אבנים לבניין וכו'"],
+                ["מְטִיל","גוש מתכת יצוקה בצורה כלשהי"],
+                ["מַטָּף","מיכל שמשמש לכיבוי אש"],
+                ["מִיכֵּן","התקין מכונות במקום מסוים לצורך ביצוע עבודות שעד כה נעשו באופן ידני"],
+                ["מְכוּנָף","שיש לו כנפיים"],
+                ["מַכּוֹת נֶאֱמָנוֹת / נִמְרָצוֹת","מכות חזקות מאוד"],
+                ["מִכְסָה","כמות מסוימת שנקבעה מראש"],
+                ["מַעֲטֶה","כיסוי, כְּסוּת, מַעֲטֶפֶת"],
+                ["מְפַעְפֵּעַ","מחלחל, חודר","מעלה בועות, משמיע רעש של מים רותחים, מבעבע"],
+                ["מַצְבִּיא","מפקד צבאי בכיר, קצין"],
+                ["מַקְרֵן","רדיאטור","מכשיר להקרנת שקופיות"],
+                ["מִקְשָׁה","שדה דלועים (אבטיחים, דלעות, קישואים או מלונים)"],
+                ["מַרְזֵב","צינור לניקוז מים מגג הבניין לאדמה או לביוב"],
+                ["מֻרְשֶׁה","מי שנתן ייפוי כוח לאדם אחר כדי שייצג אותו (לרוב הכוונה ללקוח של עורך הדין)"],
+                ["מְשׁוּבָה","מעשה קונדס, שובבות"],
+                ["מְשׁוּבַת נְעוּרִים","מעשה שנובע מקלות דעת או משובבות"],
+                ["מָשַׁח","מרח (בד\"כ שמן)","יצק שמן על דבר בכדי לקדשו"],
+                ["מִשְׁלַח יָד","עבודה, עיסוק, מקצוע"],
+                ["מִשְׁעוֹל","דרך עפר צרה, שביל"],
+                ["מִשְׁתָּלָה","מקום בו מגדלים ומוכרים שתילים"],
+                ["מִתְרָס","מחסום מאולתר מחפצים שונים"],
+                ["נְחוּשְׁתַּיִים","שלשלאות שנועדו למנוע את חופש התנועה של האסירים, כבלים"],
+                ["נַיָּח","קבוע, מקובע, שאינו נייד, לא ניתן להזיזו ממקום למקום"],
+                ["נִיחוֹחַ","ריח נעים וטוב"],
+                ["נִיתֵּץ","ניפץ לרסיסים, ריסק"],
+                ["נִכְנַס בָּעֲבִי הַקּוֹרָה","התמודד עם הבעיה, ירד לעומקו של עניין"],
+                ["נָס","נעלם, התפוגג","ברח, נמלט"],
+                ["נָפַל עַל אָזְנַיִם עֲרֵלוֹת","לא הקשיבו למה שאמר, דיבר אל העצים והאבנים"],
+                ["נִפְתָּל","עקלקל, פתלתל","ערמומי, תחבולני"],
+                ["נִיצָּב","ידית של חרב, קת","עמד, מוקם","אנך","שחקן בתפקיד שולי שמשמש כתפאורה, סטטיסט"],
+                ["נְקִי כַּפַּיִים","ישר, הגון, צדיק"],
+                ["נִקְלֶה","בזוי, נחות, בעל ערך נמוך"],
+                ["נְקָפוֹ לִבּוֹ / מַצְפּוּנוֹ","נתקף ייסורי מצפון, התחרט"],
+                ["נִשְׂגָּב מִבִּינָתוֹ","אינו יכול להבין את הדבר"],
+                ["סָבַב אוֹתוֹ בְּכַחַשׁ","שיקר לו, רימה אותו"],
+                ["סוֹאֵן","רועש"],
+                ["סוּמָא","עיוור"],
+                ["סִיכָה","מריחה בשמן, משיחה"],
+                ["סִמְטָה","רחוב צדדי וצר"],
+                ["סַף","מפתן בדלת הכניסה, אדן","התנאי או הכמות המינימאלית להתרחשותו של דבר מה"],
+                ["סִפּוּן","תקרה, חלקה העליון של האוניה (התקרה של בטן האוניה)"],
+                ["סָפוּן","צפון, נסתר"],
+                ["עוּל יָמִים","צעיר"],
+                ["עָכוּר","לא צלול, דלוח","עצוב, מדוכדך","לא תקין, משובש"],
+                ["עַל כַּרְעֵי תַּרְנְגוֹלֶת","רעוע ובלתי יציב"],
+                ["עַל מֵי מְנוּחוֹת","ברוגע, בשלווה"],
+                ["עָלַץ","שמח, התמלא שמחה"],
+                ["עָמַד עַל דַּעְתּוֹ","הפך לבר דעת, התחיל להבין","התעקש, המשיך להחזיק בדעתו, עמד על שלו"],
+                ["עִמְעוּם","גרימה למשהו להיות מעורפל או מטושטש, הפיכתו לפחות ברור משהיה","החלשת האור והפיכתו לעמום יותר"],
+                ["עָנָיו","צנוע"],
+                ["עָקֵב בְּצַד אֲגוּדָל","צעד אחר צעד, בזהירות יתרה"],
+                ["עָשָׂה שַׁמּוֹת","הרס משהו, החריב"],
+                ["פַּדַּחַת","מצח"],
+                ["פִּדְיוֹן","המרה של שטר התחייבות בכסף","הכנסה המתקבלת בפרק זמן כלשהו","שחרור אדם או דבר מה בערבות כספית או שוות ערך אחרת"],
+                ["פּוֹשֵׁט יָד","קבצן"],
+                ["פִּכְפּוּךְ","זרימה, נביעה"],
+                ["פִּסְגָּה","החלק הגבוה ביותר בהר"],
+                ["פְּצִירָה","מכשיר המשמש לשיוף והחלקה (של עץ, מתכת וכו')","כלי לטיפוח הציפורניים"],
+                ["פְּרִימָה","התרת קשרים"],
+                ["פְּרַקְדָּן","שכוב על הגב"],
+                ["פָּשַׁט יָד","ביקש נדבה, קיבץ נדבות"],
+                ["פְּתִית","פירור"],
+                ["צָחִיחַ","מחוסר מים, יבש"],
+                ["צַחֲנָה","סירחון, עיפוש"],
+                ["צִיטָטָה","קטע המובא לשם חיזוק או הדגמה (לרוב ממקור כתוב כלשהו), מובאה"],
+                ["צָלוּל","לא עכור, שקוף"],
+                ["צָפוּן","נסתר, נעלם"],
+                ["קֵהֶה","לא חד","עמום, מעורפל","שאינו בשל, בוסר"],
+                ["קָטֵגוֹר","עורך הדין שתובע את הנאשם"],
+                ["קְלִיָּה","חריכה של גרגרי תבואה"],
+                ["קָמוּר","מעוקם בצורת קערה כלפי מעלה, קשתי (להיפך: קעור)"],
+                ["קָנָה (לוֹ) שְׁבִיתָה","התמקם, השתקע"],
+                ["קָתֶדְרָה","שמו של הכיסא עליו יושבים הבישופים","במה עליה עומד הנואם, דוכן","יחידה מדעית במוסד להשכלה גבוהה"],
+                ["רִדֵּד","שיטח"],
+                ["רָדוּד","לא עמוק"],
+                ["רִיק","וָואקוּם, אֶפֶס"],
+                ["רִיקַּע","הפך לשטוח (יצר צורות על ידי שיטוח מתכת)"],
+                ["רָקַע","דרך בחוזקה על הקרקע"],
+                ["רָתַח","כעס מאוד"],
+                ["שְׁאָר רוּחַ","יכולות רוחניות ונפשיות גדולות כגון רגישות, פתיחות וכדומה"],
+                ["שְׁבִיתַת נֶשֶׁק","הפסקת אש, הפסקה מוסכמת של כל פעולות הלחימה"],
+                ["שְׂדֵרָה","שכבה חברתית, מעמד, סטטוס","שיירה (בד\"כ של כלי רכב), שורה","רחוב רחב, סמטה"],
+                ["שִׁינֵּן","למד היטב, חזר שוב ושוב על משהו כדי לזכור אותו"],
+                ["שַׁלְשֶׁלֶת","שרשרת כבדה עשויה טבעות מתכת"],
+                ["שָׂם לְאַל","מנע את התגשמותו של משהו, סיכל"],
+                ["שָׁפַךְ לִבּוֹ","השתפך, חשף את כל צרותיו בפני מישהו"],
+                ["שָׁרָב","מזג אוויר חם מאוד"],
+                ["שְׁרַפְרַף","כסא נמוך, הדום"],
+                ["תָּהָה עַל קַנְקַנּוֹ","עמד על טיבו, בחן אותו"],
+                ["תּוֹרֶן","מוט גבוה בספינה לקשירת המפרשים","עמוד גבוה לתליית דגל"],
+                ["תֵּל","גבעה מלאכותית, ערמה, גל"],
+                ["תָּמַהּ","הטיל ספק, התחבט לגבי נכונותו של הדבר","התפלא, מוזר ומפתיע"],
+                ["תַּסְכִּית","יצירה דרמתית שעובדה לשידור ברדיו"],
+                ["תָּעָה","איבד את הדרך"],
+                ["תַּרְעוֹמֶת","תחושת כעס, רוגז"],
+                ["תְּשׁוּקָה","רצון עז, תאווה עזה"]
+            ],
+            5: [
+                ["אֵבוּס","כלי להגשת אוכל לבהמות"],
+                ["אָבוּס","מפוטם"],
+                ["אֶבֶן בּוֹחַן","אמת מידה, מדד"],
+                ["אוּרְבָּנִי","עירוני (urban)"],
+                ["אוֹתִיּוֹת קִדּוּשׁ לְבָנָה","אותיות גדולות במיוחד (להיפך: אותיות טַל וּמָטָר)"],
+                ["אֵיד","צרה, אסון"],
+                ["אַיֵּה?","איפה?"],
+                ["אֵין-אוֹנִים","אי יכולת להתמודד, חולשה מוחלטת"],
+                ["אִיפּוּל","איסור פרסום ברבים, צנזורה, עמימות"],
+                ["אֲלוּנְטִית","מגבת"],
+                ["אִלְפָּס","סיר עמוק עם ידית ומכסה, מחבת עמוקה"],
+                ["אָמָה","משרתת, שפחה","מידת אורך קדומה (מהמרפק עד שורש כף היד)"],
+                ["אֶמְפִּירִי","שמבוסס על ניסוי (להיפך: תיאורטי)"],
+                ["אִמְרָה","שולי האריג, שפת הבגד","פתגם"],
+                ["אַסְדָּה","סירה קטנה, רפסודה"],
+                ["אַסְקוּפָּה","סף"],
+                ["אַסְקוּפָּה הַנִּדְרֶסֶת","כינוי לאדם שכולם מתעמרים בו, אדם חלש אופי"],
+                ["אָרְכָה לוֹ הַשָּׁעָה","הזמן נדמה בעיניו כנצח, היה חסר סבלנות"],
+                ["אַרְכּוּף","סד עינויים בו נקשרות הרגליים והידיים","טבעת לרגלו של הרוכב"],
+                ["אַרְכָנִי","ארוך שלא לצורך"],
+                ["אַשְׁמוֹרֶת","שליש מהלילה, חלק מהלילה"],
+                ["אָתֵאִיסְט","מי שכופר בקיום האל, מי שמביע חוסר אמונה באל עליון כלשהו"],
+                ["בָּא בַּיָּמִים","זקן, קשיש"],
+                ["בֶּדֶק בַּיִת","בקרה עצמית, בדיקה לצורך שיפור"],
+                ["בְּהֶנֵף יָד","בקלות, כלאחר יד, ללא מחשבה"],
+                ["בּוֹר סוּד (שֶׁאֵינוֹ מְאַבֵּד טִיפָּה)","בעל זיכרון טוב (סוד - מְסוּיָּד, שהמים לא נספגים בקירותיו ונשארים בתוכו)"],
+                ["בָּזִיךְ","סוג של כוס, גביע","סוג של קערה"],
+                ["בִּזְעֵיר אַנְפִּין","בקנה מידה קטן, מוקטן"],
+                ["בִּיזֵּר","האציל סמכויות, פיזר אחריות"],
+                ["בָּחַשׁ בַּקַּלַּחַת","סכסך"],
+                ["בֵּין הַמְּצָרִים","במצב דחוק, באין מוצא"],
+                ["בֵּין הַשִּׁיטִין","בין השורות, במרומז, לא באופן מפורש"],
+                ["בֵּית גְּנָזִים","מקום אחסון למסמכים"],
+                ["בֵּית נְכוֹת","מוזיאון"],
+                ["בֵּית עֲבוֹט","מקום בו ניתן למשכן חפצים תמורת הלוואה, בית משכונות"],
+                ["בְּלִיל","תערובת"],
+                ["בֶּן-דְּמוּתוֹ","דומה לו"],
+                ["בֶּן-כִּלְאַיִים","בעל חיים או צמח שהוא תוצר של שילוב בין שני מינים שונים"],
+                ["בְּעָלְמָא","ללא סיבה מיוחדת"],
+                ["בְּעָתָה","פחד פתאומי, בהלה, חרדה"],
+                ["בְּצוֹק הָעִתִּים","בזמנים קשים, בזמן מצוקה"],
+                ["בְּשָׂפָה רָפָה","בקול חלש, במלמול","אמר את שאמר בחוסר רצון ומתוך הכרח"],
+                ["גֶּזֶם","הענפים שנגזמו, הפסולת שנשארה לאחר הגיזום"],
+                ["גִּילָּה אֶת אָזְנוֹ","סיפר לו סוד"],
+                ["גָּמָא / גָּמַע","לגם, שתה"],
+                ["גֶּפֶת","פסולת הזיתים לאחר הסחיטה"],
+                ["גֶּרֶם","עצם (כמו עצמות השלד)","גוף בעל צורה ונפח (גרם מדרגות - סדרה רצופה של מדרגות, גרם שמים - גוף שְׁמֵימִי)"],
+                ["דְּבָרִים בְּעָלְמָא","דברים סתמיים, ללא כוונה מיוחדת"],
+                ["דָּחַק אֶת הַקֵּץ","ביקש לקרב את הסוף קודם זמנו"],
+                ["דָּחַק אֶת הַשָּׁעָה","עשה משהו לפני זמנו, נהג בפזיזות"],
+                ["דָּחַק אֶת רַגְלָיו","תפס את מקומו, נישל אותו מתפקידו"],
+                ["דִּנְדֵּן","צלצל בפעמון"],
+                ["דַּעְתָּן","מי שיודע להביע את דעתו בצורה נחרצת ויכול לדבוק בעמדותיו, אסרטיבי"],
+                ["דָּרְבָּן","גלגל שיניים קטן המחובר לעקב המגף ונועד לדרבן את הסוס (על ידי דקירתו)"],
+                ["הֶאֱבִיס","נתן אוכל רב מדי","האכיל בעלי חיים"],
+                ["הֶאֱנִישׁ","ייחס תכונות אנושיות למי שאינו אנושי"],
+                ["הֶדוֹנִיזְם","נהנתנות, רדיפת תענוגות"],
+                ["הוֹלֵךְ עַל קֶרַח דַּק","נמצא במצב קשה ומסוכן תחת נסיבות שאינן לחלוטין בשליטתו"],
+                ["הִזָּה","התיז נוזל, טפטף, הזליף"],
+                ["הִידֵּס","הלך בצורה לא יציבה כשהוא נוטה מצד לצד"],
+                ["הִיפּוֹתֵטִי","משוער, לא ודאי, תיאורטי"],
+                ["הֵלִיט","כיסה, הסתיר (לוט - כיסוי)"],
+                ["הָלַךְ עַל חֶבֶל דַּק","מצוי במצב שבו כל טעות קטנה יכולה להסב לו נזק"],
+                ["הֲלָנַת שָׂכָר","עיכוב תשלום השכר לעובד"],
+                ["הִפְטִיר","קרא הפטרה (קטע מספרי הנביאים שקוראים בבית כנסת)","אמר משהו ללא תשומת לב מיוחדת, \"זרק\" משהו לאוויר"],
+                ["הִפְרִיט","העביר בעלות מהמדינה לידיים פרטיות (להיפך: הלאים)"],
+                ["הִקְדִּיחַ","בישל יתר על המידה"],
+                ["הַרְרֵי זָהָב","דמיונות וגוזמאות"],
+                ["הִתְחַוֵּור","התברר ללא ספק, הסתבר"],
+                ["הִיתַּמֵּם","עשה עצמו תמים, התנהג כאילו אינו יודע במה מדובר"],
+                ["וָאדִי","אפיק נחל סלעי (מרבית השנה הוא יבש)"],
+                ["ווּלְגָרִי","המוני, גס, פשוט ביותר"],
+                ["זוּג","החלק החיצון בפעמון, דפנותיו של פעמון (מה שמַכֶּה בזוג הוא העִנְבָּל)"],
+                ["חֲדַל פֵּרָעוֹן","מי שלא מסוגל לשלם את חובו"],
+                ["חוֹרֵשׁ מְזִמּוֹת","זומם, מתכנן להרע"],
+                ["חִילּוּפֵי גַּבְרֵי","החלפת בעלי תפקידים"],
+                ["חֵלֶב","שעוות נר","שומן המצוי בגופם של בעלי חיים"],
+                ["חָלַט","יצק מים חמים"],
+                ["חֲלִיפַת מִכְתָּבִים","התכתבות בין שני אנשים או גופים"],
+                ["חֵמָה","כעס, זעם, רוגז"],
+                ["חָנוּט","מומיה"],
+                ["חֲנִיטָה","השריית גופת אדם או חיה בחומר מיוחד המונע ממנה להירקב"],
+                ["חֲפוּי רֹאשׁ","נבוך, מבויש, נכלם"],
+                ["חָרְשָׁף","ארטישוק"],
+                ["טִיכֵּס עֵצָה","התייעץ, חיפש תחבולה"],
+                ["טְפָחוֹת","הקורות העליונות של מבנה"],
+                ["טְרוּט עֵינַיִים","בעל עיניים עצומות למחצה בשל עייפות, חוסר שינה או חולי"],
+                ["טְרוּנְיָה","תלונה, תרעומת, טענה קשה"],
+                ["יָגוֹן","תסכול, דכדוך, דיכאון"],
+                ["יוֹבֵל","חמישים שנה"],
+                ["יוּבַל","נחל, זרוע של נהר"],
+                ["יוֹגֵב","איכר, עובד אדמה, חקלאי"],
+                ["יוֹשֵׁב קְרָנוֹת","בטלן, הולך בטל (קרן = פינה), אוכל לחם חסד"],
+                ["יֵשׁ דְּבָרִים בְּגוֹ","יש טעם בדבר, יש בזה היגיון"],
+                ["כָּאוֹטִי","במצב של אי סדר"],
+                ["כָּאוֹס","ערבוביה, תוהו ובוהו"],
+                ["כְּבוּדָּה","מטען, משא"],
+                ["כּוֹרֵם","בעל מקצוע שמגדל גפנים וענבים"],
+                ["כּוֹתֶרֶת","העלים הצבעוניים של הפרח","אדריכלות - החלק העליון של עמוד אבן, בדרך כלל מקושטת במוטיב צמחי"],
+                ["כְּזַיִת","קצת, מעט, קמעה"],
+                ["כִּישׁוֹר","קנה שנכרכים עליו חוטי הצמר או הפשתן הנטווים"],
+                ["כִּמְטַחֲוֵי קֶשֶׁת","קרוב, בהישג יד, בקרבת מקום (בטווח ירייה של חץ מקשת)"],
+                ["כָּפִיס","קרש, קורת עץ"],
+                ["לַבְלָר","פקיד, מזכיר"],
+                ["לוֹיָאלִי","נאמן, שומר אמונים"],
+                ["לָטֶנְטִי","חבוי, כמוס, רדום (להיפך: אוֹבֶרְטִי)"],
+                ["לְעֵילָא וּלְעֵילָא","הטוב ביותר, המובחר"],
+                ["מַבּוּעַ","מעיין, מקור, יסוד"],
+                ["מוֹנוֹגַמְיָה","נשיאת אשה אחת בלבד (להיפך: ביגמיה, פוליגמיה)"],
+                ["מוֹנוֹתֵאִיזְם","אמונה באל אחד"],
+                ["מַזְלֵף","משפך"],
+                ["מְחַרְחֵר (רִיב)","סכסכן, איש מדון"],
+                ["מִיטַת סְדוֹם","מקום או מצב שאין בו חופש פעולה"],
+                ["מָלַק","ערף את ראשו של בעל חיים"],
+                ["מַסָּד","בסיס, יסוד"],
+                ["מְסוּפָּק","מלא ספקות, שרוי בספק","בא על סיפוקו"],
+                ["מְעוּקָּר","שעבר חיטוי מוחלט מכל החיידקים שבו, סטרילי"],
+                ["מַקְצוּעָה","אחד מכליו של הנגר המשמש להחלקת עצים"],
+                ["מַרְבֵּק","מקום בו מפטמים בעלי חיים"],
+                ["מַרְחֶשֶׁת","מחבת לטיגון"],
+                ["מַרְצֵעַ","מכשיר ניקוב (עבד נרצע - עבד עולם שסומן ע\"י ניקוב אוזנו)"],
+                ["מָשַׁךְ בְּעֵט","עסק בכתיבה, כתב דברי ספרות"],
+                ["מַשְׂכִּית","קישוט, תכשיט","ציור, תמונה"],
+                ["נְאָקָה","אנחת כאב, גניחה"],
+                ["נָאקָה","הנקבה של הגמל"],
+                ["נֶחְבָּא אֶל הַכֵּלִים","מי שאינו יהיר ואינו מתרברב, צנוע"],
+                ["נָס לֵחוֹ","איבד מערכו, איבד מכוחו"],
+                ["נֶקֶב / נַקְבּוּבִית","חור קטן, חריר"],
+                ["סַדָּן","בסיס מעץ או מתכת עליו מניחים חומרים שונים כדי לעבדם (בין הפטיש לסדן - במצב ללא מוצא)","הקטע הבולט מן הקרקע של העץ לאחר שנכרת, גדם, גדע"],
+                ["עוֹלָל / עוֹלֵל","תינוק"],
+                ["עָטָה","לבש, התכסה"],
+                ["עַיִר","חמור צעיר"],
+                ["עָרַג","זעק, התחנן","רצה מאוד, השתוקק, התגעגע"],
+                ["עֲרִירִי","חסר צאצאים","בודד, גלמוד, מיותם"],
+                ["עֲשָׂבִים שׁוֹטִים","דברים שליליים שיש להיפטר מהם, עשבים רעים"],
+                ["פֿוֹרְס מָז'וֹר","אירוע שנמצא מעבר לשליטתנו ושלא ניתן לצפות מראש, יד הגורל"],
+                ["פּוֹשֵׁט עוֹרוֹת","מי שגובה מחיר מופקע על מרכולתו או שירותיו, נצלן"],
+                ["פַּרְגּוֹל","שוט"],
+                ["פְּרֶמְיֵירָה","הצגת הבכורה, ההופעה הראשונה"],
+                ["צִיקְלוֹן","סופה","תרמיל"],
+                ["צַיְיקָן","קמצן, צר עין"],
+                ["צָפִיר","תַּיִשׁ"],
+                ["קֻבַּעַת","גביע, כוס או קערה עם \"רגל\""],
+                ["קוֹהֶרֶנְטִי","שיש קשר בין חלקיו, רציף, עקבי"],
+                ["קוֹקֵטִי","גנדרן, מתחנחן"],
+                ["קוֹרֶקְטִי","נאות, ענייני"],
+                ["קִלְטֵר","הפך את האדמה, פורר את האדמה"],
+                ["קָפָא עַל שְׁמָרָיו","היה שמרני, לא התקדם"],
+                ["קֹצֶר רוּחַ","חוסר סובלנות"],
+                ["קֶרֶת","עיר, קריה"],
+                ["קַרְתָּן","כינוי גנאי לאדם שמרן (קַרְתָּנוּת = פרובינציאליות)"],
+                ["קַרְתָּנִי","בן עיר קטנה"],
+                ["רוֹדֵף שְׂרָרָה","כינוי לתאב כוח והשפעה"],
+                ["שִׁבֹּלֶת","גבעול התבואה עצמו"],
+                ["שָׁדוּד","עייף מאוד, מדוכא"],
+                ["שׁוֹבֵב אֶת נַפְשׁוֹ","עודד אותו, דרבן אותו"],
+                ["שָׂטַם","שנא, תיעב"],
+                ["שֶׂכְוִי","תרנגול"],
+                ["שְׁנָתוֹת","קווי סימון על כלי למדידת כמות"],
+                ["שָׁעָה קַלָּה","פרק זמן קצר"],
+                ["שַׁפִּיר","טוב, בסדר, מניח את הדעת"],
+                ["שָׂפַת","שם כלי לחימום על האש (שפת את הקומקום - שם את הקומקום על האש)"],
+                ["שָׁקַט עַל שְׁמָרָיו","היה שמרני, לא התקדם"],
+                ["תּוּגָה","דכדוך, דיכאון"],
+                ["תּוֹפֶת","גיהינום, מקום נורא אשר יש בו סכנת חיים"],
+                ["תַּרְוָוד","כף מבשלים, מצקת"]
+            ],
+            6: [
+                ["אֶבֶן דֶּרֶךְ","נקודת ציון המסמנת אירוע משמעותי בהשתלשלות של מאורעות"],
+                ["אֶבֶן רֵחַיִים עַל צַוָּארוֹ","אחריות כבדה שמעיקה עליו וממנה לא יכול להשתחרר, קושי רב"],
+                ["אֲבַק אָדָם","אדם חסר ערך"],
+                ["אַדֶּרֶת","גלימה, מעיל עליון רחב (בעיקר של איש עשיר או מכובד)"],
+                ["אוּד","גזיר (חתיכת) עץ שלא נשרף כולו"],
+                ["אוֹפּוֹרְטוּנִיזְם","ניצול הזדמנויות (בדרך כלל בהקשר שלילי) (הזדמנות - opportunity)"],
+                ["אֹרֶךְ רוּחַ","סבלנות, מתינות"],
+                ["אֲחוּז תְּזָזִית","חסר מנוחה, בעל מרץ בלתי נדלה ובלתי נשלט, נסער"],
+                ["אֵימָתַי","מתי?"],
+                ["אֵין יָדוֹ מַשֶּׂגֶת","אין ביכולתו להשיג, אינו יכול לרכוש או לממן"],
+                ["אִישׁ קְצָווֹת","אדם קיצוני"],
+                ["אִלְחוּשׁ","גרימה לחוסר תחושה בחלק בגוף, הרדמה"],
+                ["אַלְיָה וְקוֹץ בָּהּ","דבר טוב שיש בו פגם קטן"],
+                ["אַמְבָּר","אסם, מחסן תבואה"],
+                ["אִימֵּץ אֶת יָדָיו","עודד אותו, דרבן אותו"],
+                ["אַרְכָאִי","מיושן, עתיק, קדום, ששייך לעבר"],
+                ["אַרְכִיפֶּלָג","קבוצת איים"],
+                ["אֶשְׁנָב","חלון קטן, פתח"],
+                ["אַשְׁפָּרָה","גימור איכותי ומשופר של מוצר (בדרך כלל טקסטיל או בטון)","עיבוד ושיפור האריג"],
+                ["בָּא בִּדְבָרִים","דיבר עמו, שוחח"],
+                ["בָּא כֹּחַ","מורשה, נציג"],
+                ["בָּאוּ לְעֵמֶק הַשָּׁוֶוה","התפשרו, הסכימו, השתוו"],
+                ["בּוּסְתָּן","גן של עצי פרי"],
+                ["בַּחֲרוּת","תחילת תקופת הבגרות (מהמילה בחור)"],
+                ["בֵּין הָעַרְבַּיִים","הזמן בין שקיעת השמש ועד שמחשיך, לפנות ערב"],
+                ["בֵּין הַשְּׁמָשׁוֹת","בין ערביים, בזמן דמדומים, לפנות ערב"],
+                ["בֵּית מִטְבָּחַיִים","משחטה"],
+                ["בֵּית נְתִיבוֹת","אולם נוסעים בשדה תעופה או בתחנת רכבת"],
+                ["בֵּית תַּמְחוּי","מקום שמחלק אוכל לעניים בחינם או תמורת תשלום סמלי"],
+                ["בִּמְחִי יָד","בלי מאמץ, בהינף יד"],
+                ["בֶּן-לְוָויָה","מי שמתלווה לאדם אחר, שהולך איתו"],
+                ["בַּעֲלֵי שְׂרָרָה","אנשים הנושאים בתפקיד רשמי כלשהו, אנשים רמי דרג בשלטון (בנימת גנאי)"],
+                ["בַּעֲרוֹב יָמָיו","בסוף חייו, לעת זקנתו"],
+                ["בֵּרֵא","כרת צמחיה, יצר קרחת יער"],
+                ["בְּשׂוֹרָה","ידיעה חשובה"],
+                ["גֶּבֶר","תרנגול"],
+                ["גּוּזְמָה","הגזמה, הפרזה"],
+                ["גּוּשְׁפַּנְקָה","אישור סופי","חותמת רשמית של אדם רם מעלה"],
+                ["גָּזַר","פסק, קבע את גזר הדין","הסיק"],
+                ["גְּזֵרָה שָׁוָוה","השוואה בין שני דברים ולמידה על האחד מן האחר"],
+                ["גַּיִס חֲמִישִׁי","כינוי לבוגדים מבית, גורם פנימי המסייע לאויב"],
+                ["גָּמַר בְּדַעְתּוֹ / בְּלִבּוֹ / אוֹמֶר","החליט"],
+                ["דֳּכִי","רעש הגלים כשהם מתנפצים"],
+                ["דִּיאָלוֹג","דו שיח"],
+                ["דְּיוֹטָה","קומה בבית"],
+                ["דְּיוֹתָה","כלי קיבול לדיו"],
+                ["דַּלְפוֹן","עני"],
+                ["הִבְרִיחַ","הכניס פנימה בניגוד לחוק","נעל, סגר באמצעות בריח"],
+                ["הִגִּיר","שפך, הזיל"],
+                ["הוֹלֵךְ בָּטֵל","בטלן"],
+                ["הוֹקִיעַ","תקף מילולית, מתח ביקורת, גינה","המית מישהו בפומבי בצליבה או בתלייה"],
+                ["הֵזֵם","הוכיח כי דבריו של אדם אחר אינם נכונים"],
+                ["הֶחְפִּיץ","התייחס לאדם כאילו היה חפץ"],
+                ["הִכָּה עַל חֵטְא","התחרט על מעשה רע, הודה, חזר בתשובה"],
+                ["הִלֵּךְ אֵימִים","הפחיד אותו מאוד, איים, הרתיע"],
+                ["הֵנֵץ","הוציא פרחים או ניצנים, לבלב, פרח"],
+                ["הִשְׁלִיךְ אַחֲרֵי גֵווֹ","התנער ממנו והתכחש לקשר אליו, הפנה לו עורף (גווֹ = גופו)"],
+                ["הִתְבַּשֵּׂם","השתכר, התבסם","הזליף בושם על הגוף"],
+                ["הִתְפַּקֵּר","חזר בשאלה, כפר"],
+                ["זִבּוּרִית","אדמה גרועה שאינה טובה לשימוש חקלאי","החלק הגרוע, סחורה גרועה"],
+                ["זָג","קליפת הפרי (בדרך כלל משמש בהתייחסות לקליפת הענב)"],
+                ["זְחִיחוּת דַּעַת","שביעות רצון עצמית הגובלת ביהירות"],
+                ["חָוָוק","מדרגה, שלב בסולם"],
+                ["חִילָּה","המתיק"],
+                ["חִילָּה אֶת פָּנָיו","התחנן (חילה - המתיק)"],
+                ["חִישּׁוּר","מוט המחבר את מרכז הגלגל עם החישוק","אחת העצמות בכף היד"],
+                ["חָמַד לָצוֹן","שם מישהו לצחוק, התלוצץ"],
+                ["חֲמַרְמֹרֶת","האנג-אובר"],
+                ["חָרֵד","מפחד, מבוהל, מזועזע"],
+                ["חֶרְמֵשׁ","כלי לקצירת תבואה המורכב מסכין בצורת קשת המחוברת למקל ארוך"],
+                ["חָתוּל בַּשַּׂק","כינוי לדבר שטיבו לא ידוע"],
+                ["טַס","מגש"],
+                ["טַפְסָן","פועל בניין מומחה בהתקנת תבניות ליציקת בטון"],
+                ["טַפְסָר","דרגת קצונה במכבי-אש","פקיד"],
+                ["טָרַף","ערבב (טרף קלפים)"],
+                ["יָגוֹר","פוחד, חושש (אשר יגורתי בא - הדבר ממנו חששתי קרה)"],
+                ["יוֹשֵׁב עַל הַגָּדֵר","נמנע מלנקוט עמדה, נמנע מלצדד"],
+                ["יִיחֵל","קיווה"],
+                ["יִצְהָר","שמן זך"],
+                ["יָשַׁב עַל הַמְּדוֹכָה","התלבט, התחבט (מדוכה - קערה לכתישת תבלינים בעזרת עֵלִי)"],
+                ["כְּבָרָה","מסננת, כלי שתשתיתו עשויה רשת"],
+                ["כִּיּוּל","כיוון, איפוס"],
+                ["כִּיפֵּחַ","גבוה מאוד"],
+                ["כִּלְאַחַר יָד","בלי כוונה מיוחדת, כבדרך אגב"],
+                ["לֹא בִּכְדִי","לא לשווא, לא לחינם"],
+                ["לְהַנְּתִי","לצערו הרב, למזלו הרע"],
+                ["לוֹקָלִי","מקומי (local), אזורי"],
+                ["לֵיל שִׁמּוּרִים","לילה לבן, לילה שערים בו (בדרך כלל מתוך דאגה)"],
+                ["מָאוֹר","גוף מפיץ אור, זוהר"],
+                ["מַגְלֵב","שוט"],
+                ["מְדוּשָׁן עוֹנֶג","מרוצה מאוד, מלא נחת, מסופק"],
+                ["מוּג לֵב","פחדן, רַךְ לֵב"],
+                ["מוֹנוֹלוֹג","נאום, שיח יחיד"],
+                ["מוֹץ","קליפת גרגירי הדגנים"],
+                ["מוּשְׂכָּל רִאשׁוֹן","הנחת יסוד שאינה ניתנת להוכחה, אולם מתייחסים אליה כאילו היא נכונה ולא ניתנת לערעור"],
+                ["מָט","זז במקומו בחוסר יציבות","מטושטש, עמום"],
+                ["מָט לִנְפּוֹל","לא יציב, רעוע"],
+                ["מַכְלֵב","מהדק, שדכן"],
+                ["מִלְּגוֹ / מִלְּגַו","מבפנים, מתוך (להיפך: מִלְּבַר)"],
+                ["מִלְּגוֹ וּמִלְּבַר","מבפנים ומבחוץ"],
+                ["מֶלוֹדִי","בעל מנגינה נעימה"],
+                ["מְלִיצָה","דברי חכמה, לעתים בסגנון פיוטי עם חריזה","דיבור גבוה, לעתים תוך ציטוט פסוקים"],
+                ["מַמְגוּרָה","אסם תבואה גדול"],
+                ["מְסוּקָּס","מחוספס, מיובל"],
+                ["מִסְרוֹן","אס-אם-אס, הודעת טקסט"],
+                ["מְעוּשֶׂה","לא אמיתי, מזויף, מלאכותי"],
+                ["מָרָה שְׁחוֹרָה","דיכאון, ראיית שחורות, פסימיות"],
+                ["מָרִית","כלי מריחה הדומה לסכין עם להב קהה, שפכטל"],
+                ["מַשּׂוֹא פָּנִים","העדפה של אחד הצדדים, אפליה"],
+                ["מַשְׁכּוּכִית","כינוי לאייל המושך את העדר אחריו"],
+                ["נָבוּב","חלול, ריק. בהשאלה: ריקני, שטחי"],
+                ["נִיבוֹן","אוסף ניבים ופתגמים, מילון ניבים"],
+                ["נִמְלַךְ בְּדַעְתּוֹ","חשב והתלבט לגבי סוגיה כלשהי","שינה את דעתו, התחרט"],
+                ["נִמְלַךְ בּוֹ","התייעץ איתו, נועץ בו"],
+                ["נָפִיל","ענק"],
+                ["נִצְרָךְ","אדם עני שזקוק לעזרה"],
+                ["נֶקְטָר","משקה האלים, משקה פירות \"איכותי\" יותר ממשקאות תרכיז למיניהם"],
+                ["סְגַלְגַּל","אליפטי, בצורת ביצה"],
+                ["סָר","פנה, זז, יצא","פקד, בא, לבקר"],
+                ["סִירְהֵב","הפציר, ביקש","עמד על התנגדותו למשהו, לא הסכים"],
+                ["עוֹקֵר הָרִים","בעל שכל חריף, כינוי לאדם חריף בדברי תורה"],
+                ["עוּר!","קום! התעורר!"],
+                ["עִיזָּבוֹן","ירושה"],
+                ["עִידִּית","אדמה משובחת. בהשאלה: דבר משובח, החלק המובחר"],
+                ["עֵינַיִים טְרוּטוֹת","עיניים סגורות למחצה (לרוב עקב מחסור בשינה)"],
+                ["עָלֶה נִידָּף","חלש וחסר אונים, חדל ישע"],
+                ["עַפְרָה","סלע המכיל מתכת, מחצב"],
+                ["עַפְרוֹת זָהָב","שכבות של אדמה המכילה זהב"],
+                ["עִיקֵּר","גרם לו להיות עקר (חסר יכולת להביא צאצאים)","חיטא, טיהר"],
+                ["עָקַר","היגר, ירד (מהארץ)","תלש, שלף, קרע אותו ממקומו"],
+                ["עָקָר","חסר טעם או תועלת","שאינו פורה, לא מסוגל להוליד צאצאים"],
+                ["עָקַר אֶת רַגְלָיו","הלך"],
+                ["עַרְדָלַיִים","נעליים שנועלים על נעליים כדי שלא יירטבו"],
+                ["פֶּה מֵפִיק מַרְגָּלִיּוֹת","כינוי לאדם בעל כושר ביטוי יוצא מן הכלל"],
+                ["פּוֹלִיגַמְיָה","נישואי גבר למספר נשים (פולי - הרבה)"],
+                ["פָּלוּשׁ","פרוזדור, מסדרון"],
+                ["פָּסַח עַל שְׁתֵּי הַסְּעִיפִּים","היסס, לא היה עקבי"],
+                ["פַּרְהֶסְיָה","לעיני כל, בפומבי"],
+                ["פְּרַקְלִיט","עורך דין, טוען"],
+                ["צִחְצוּחַ חֲרָבוֹת","התנצחות, ויכוח סוער"],
+                ["צִינָּה","מגן","קור"],
+                ["צִלְצָל","כידון המחובר לחבל ומשמש לציד ימי"],
+                ["קִיבּוֹרֶת","שריר הזרוע"],
+                ["קְדִימוֹן","פרומו"],
+                ["קוֹטֵל קָנִים","אדם פשוט, חסר השכלה (מופיע בעיקר בביטוי: אינו קוטל קנים - מומחה)"],
+                ["קוּרְנָס","פטיש כבד"],
+                ["קְטַן אֱמוּנָה","ספקן, סקפטי"],
+                ["קִיצֵּץ אֶת כְּנָפָיו","הפריע לו במשהו ומנע את חופש פעולתו, הגביל","הפיג את התלהבותו"],
+                ["קִיתוֹן","כד, כלי לנוזלים"],
+                ["קָץ","מאס, נמאס עליו"],
+                ["קִירְקֵעַ","אסר להמריא, ריתק לקרקע","ריתק לבית"],
+                ["רֵחַיִים","מתקן משתי אבנים לטחינת גרגרי תבואה (רֶכֶב וּשֶׁכֶב - האבן העליונה והאבן התחתונה)"],
+                ["רֵיחַיִים עַל צַוָּארוֹ","אחריות כבדה שמעיקה עליו וממנה לא יכול להשתחרר, קושי רב"],
+                ["שְׁבִיב","ניצוץ. בהשאלה: מעט מאד, שמץ (שביב תקווה - ניצוץ של תקווה)"],
+                ["שִׁבֹּלֶת","סוג של תפרחת המורכבת מגרגרים צמודים","זרם מים חזק מאוד, מערבולת"],
+                ["שָׁדוּף","ריק, חסר תוכן","דק, רזה"],
+                ["שׁוּר","הבט, ראה, הסתכל (בציווי)"],
+                ["שָׁח / שָׁחָה","התכופף (שחוח - כפוף)","קד קידה, השתחווה, השתטח"],
+                ["שִׂחֲקָה לוֹ הַשָּׁעָה","התמזל מזלו"],
+                ["שִׁיוָוה (בְּנַפְשׁוֹ)","דמיין"],
+                ["שִׂיחוֹן","ספרון המכיל משפטים ותרגומם לצורך לימוד שפה או ככלי עזר לתיירים"],
+                ["שְׂרָרָה","שלטון, סמכות"],
+                ["תּוּפִין","מאפה, עוגיה"],
+                ["תְּזָזִית","שיגעון, טירוף"]
+            ],
+            7: [
+                ["אֶבְיוֹן","עני, חסר-כל"],
+                ["אִיבֵּק","ניקה מאבק, הוציא אבק","פיזר אבקה על משהו"],
+                ["אוּרִים וְתוּמִּים","מומחה, מקור מוסמך שאין לערער עליו, סמכות עליונה"],
+                ["אֶזוֹטֶרִי","פנימי, כמוס, ידוע רק לחוג מצומצם","שולי, חסר עניין לציבור"],
+                ["אִילוּחַ","זיהום, מוגלה"],
+                ["אִינְטֶגְרָלִי","חלק חיוני ובלתי נפרד, שאי-אפשר בלעדיו","שלם, שכל חלקיו נמצאים"],
+                ["אֶפִּילוֹג","קטע קצר שנוסף לספר לאחר סיומו","סוף, סיום"],
+                ["אִצְטְלָה","כבוד, גדולה או משרה חשובה שהם בדרך כלל מדומים","גלימה, בגד עליון רחב שנלבש לרוב על ידי אנשים מכובדים"],
+                ["אִשְׁרוּר","אישור סופי"],
+                ["אֶתְנָן","במקור: שכר יצאנית. בהשאלה: שכר בתמורה לדבר לא מוסרי, מתנה או טובת הנאה בכדי להשיג רווח לא הוגן"],
+                ["בְּאִיבּוֹ","בראשית דרכו, בצעירותו (נקטף באיבו - מת בגיל צעיר)"],
+                ["בְּדוּתָה","שקר, דבר בדוי"],
+                ["בְּדָיָה","שקר (בָּדָה - המציא)"],
+                ["בּוּלְמוּס","רעב חזק","תאווה, חשק עז"],
+                ["בַּחֲטָף","בחופזה, במהירות","ללא סימן מוקדם, לפתע"],
+                ["בִּיגַמְיָה","נישואי גבר אחד לשתי נשים בו זמנית, נישואים כפולים"],
+                ["בָּלוּם","סתום, אטום, סגור","מלא עד הסוף, עמוס, עשיר ב-"],
+                ["בַּרְדָּס","כיסוי ראש המחובר אל הבגד מאחור, \"קפוצ'ון\""],
+                ["גָּחוֹן","בטן (בעיקר של בעלי חיים, מקובל גם בכלי רכב, גחון הטנק - החלק התחתון של הטנק)"],
+                ["גִּילְדָּה","קבוצת אנשים בעלי אינטרס משותף"],
+                ["דְּבוּקָה","צרור פצצות המשוגרות יחדיו","קבוצת צנחנים הצונחים יחדיו"],
+                ["דְּבֵלָה","גוש של תאנים מיובשות"],
+                ["דָּגָן","כל תבואת השדה"],
+                ["דוּאָלִי","בעל שני צדדים"],
+                ["דּוֹרוֹן","מתנה"],
+                ["דֶּחִי","כישלון, מעידה"],
+                ["דָּלוּחַ","לא צלול, עכור"],
+                ["דִּמְדּוּמִים","אור חיוור שניתן לראות לאחר השקיעה"],
+                ["דִּמְעוֹת שָׁלִישׁ","בכי גדול, בדמעות ובתחנונים רבים"],
+                ["דֹּפִי","פגם, ליקוי"],
+                ["דַּפְתָּר","פנקס, מחברת"],
+                ["דֵּרָאוֹן","בושה, חרפה"],
+                ["דַּרְגָּשׁ","שרפרף, כסא נמוך, ספסל נמוך לשכיבה"],
+                ["הָבִיל","ספוג הבל, מלא אדי מים"],
+                ["הִבְלִיעַ","אמר דברים בצורה מרומזת","הסתיר דבר בתוך דבר, הכמין"],
+                ["הָגִיג","מחשבה, הרהור, שרעפים, חקרי לב"],
+                ["הִגִּיהַּ","תיקן שגיאות בטקסט כתוב"],
+                ["הִגְלִיד","התאחה, נרפא"],
+                ["הִדִּיר","מנע, שלל, אסר"],
+                ["הַזָחָה","הרווח שבתחילת פסקה חדשה"],
+                ["הֵזִיחַ","הזיז משהו ממקום למקום, הסיט"],
+                ["הִילֵּךְ","שוטט, הלך לאיטו ללא מטרה מסוימת"],
+                ["הִכָּה גַּלִּים","עורר עניין, התפרסם","הביא לשינוי משמעותי בחשיבה המקובלת"],
+                ["הִכָּה שׁוֹרֶשׁ","נעשה נפוץ ורווח, התקבל"],
+                ["הֶעְתִּיק","הזיז, העביר ממקום למקום"],
+                ["הִקְהִיל","גרם לאנשים להתאסף, גרם להם להפוך לקהל"],
+                ["הֶרֶף","הפסק! די! (ללא הרף - ללא הפסקה, כל הזמן)"],
+                ["הִתִּיק","הזיז, העביר ממקום למקום, הסיט"],
+                ["זָב","מטפטף, נוזל"],
+                ["זָב חֹטֶם","אדם פחות ערך","כינוי גנאי לאדם חסר ניסיון, צעיר"],
+                ["זֶבֶד","מתנה, שי"],
+                ["זוּט","קרקעית, תחתית של כלי"],
+                ["זוּטָא","קטן מאוד, זעיר, פעוט, שולי"],
+                ["זוּטוֹת","דברים של מה בכך, אפסי, זניח, חסר משמעות"],
+                ["זוּלַת","חוץ מ-, פרט ל-"],
+                ["זוּלָת","אדם או בני אדם, שאר האנשים"],
+                ["זוּלָתָן","אדם המעדיף את טובת האחר על פני טובתו שלו"],
+                ["חָג","זז, זע, נע","נע במעגלים סביב דבר מה, הסתובב","צייר עיגול (מחוגה - מכשיר לסרטוט מעגל)"],
+                ["חֵבֶל","ייסורים, מכאוב, בציפייה לדבר חיובי (חבלי לידה)"],
+                ["חֶבֶל","אזור, מחוז"],
+                ["חֲבַרְבַּר","בעל חברבורות, מנומר"],
+                ["חָג","הודעה המופצת ברבים, תצהיר"],
+                ["חֲטָף","מהירות גבוהה (מבט חטוף - מבט מהיר)"],
+                ["חִיגֵּר","בעל מום ברגליו, צולע"],
+                ["חֲכִירָה","השכרת אדמה או נכס כלשהו למשך תקופת זמן ידוע מראש בתמורה לתשלום כספי"],
+                ["חֵלְכָּאִי","עני, אדם חלש ועלוב"],
+                ["חָרֵב","יבש","הרוס, שומם, נטוש"],
+                ["חָרָבָה","אדמה שאינה מכוסה מים, יבשה"],
+                ["טַבּוּלָה רָאסָה","אינו יודע דבר בתחום מסוים, חסר דעה בנושא מסוים"],
+                ["יוֹקֵב","בעל יקב"],
+                ["יוֹרֶה","הגשם הראשון"],
+                ["יַנוּקָא","תינוק"],
+                ["יַעֲרָה","טבלת דונג שהדבורים בנו בה תאים ומילאו אותה בדבש"],
+                ["כְּסִיל","טיפש, שוטה"],
+                ["כְּפִיר","אריה צעיר"],
+                ["כָּפָן","רעב"],
+                ["כָּפַת","קשר, כבל"],
+                ["לַאֲשׁוּרוֹ","כהלכתו, במדויק"],
+                ["לָבִיא","אריה"],
+                ["לִיבֵּן","הלהטת מתכת עד שצבעה נהיה ללבן","בירר סוגיה מסוימת כדי להגיע לפתרון או למסקנה"],
+                ["לִפְרָקִים","מדי פעם, מעת לעת"],
+                ["מַאֲפֵלְיָה","מקום משכנו של הרשע","חושך מוחלט, אפלה"],
+                ["מִבְדוֹק","מבנה מיוחד המיועד לתיקון כלי שייט"],
+                ["מְבוּזָר","מפוזר"],
+                ["מָגוֹר","פחד, אימה"],
+                ["מִיגֵּר","הביס את האויב, ניצח","השמיד משהו לחלוטין, חיסל"],
+                ["מְהוּקְצָע","מלוטש, עבר החלקה בעזרת מקצועה","מסוגנן, אלגנטי"],
+                ["מוּבָאָה","ציטוט"],
+                ["מוֹרַג","כלי דִּישׁ קדום (דיש - הפרדת גרגירי תבואה)"],
+                ["מָזוֹר","מרפא, תרופה","חולי, מכאוב"],
+                ["מִזְקָקָה","מקום לזיקוק ולהכנת משקאות חריפים"],
+                ["מַחְבּוֹשׁ","עונש של כליאה"],
+                ["מַחְבֵּצָה","כלי מיוחד ששימש להכנת מוצרי חלב כמו גבינה או חמאה"],
+                ["מְחוּטָּט","מלא בצלקות שנגרמו ממחלת עור כלשהי"],
+                ["מָךְ","עני"],
+                ["מָלֵא תְּכוּנָה","שוקק חיים, מלא פעילות"],
+                ["מֵלִיץ","מי שממליץ על מישהו ומדבר בזכותו","מתורגמן"],
+                ["מַנְפֵּטָה","מכונה מיוחדת המשמשת להפרדת סיבי הכותנה מהזרעים"],
+                ["מְסוֹאָב","מלוכלך מאוד, מטונף","מושחת מוסרית, מנוון"],
+                ["מִיסּוּךְ","שיבוש והחלשת שדות חשמליים","יצירת הפרדה, יצירת חציצה"],
+                ["מָסַךְ","מזג, ערבב משקה במשקה"],
+                ["מַעֲרַת הַיַּעַר","אזור נטול עצים ביער, קרחת היער"],
+                ["מַפְסֶלֶת","כלי עבודה המשמש לסיתות אבן או גילוף עץ, אזמל"],
+                ["מָק","ריקבון"],
+                ["מַרְזֵחַ","משתה (בית מרזח - פאב)"],
+                ["מוֹרֶךְ לֵב","הרגשת פחד וזעזוע, בעתה, אימה"],
+                ["מַרְנִין","משמח","מהנה ביותר, נעים"],
+                ["מִשְׂגָּב","מקום גבוה שמשמש כמחסה, מצודה"],
+                ["מִשְׁוֶורֶת","טבעת לרגל בצד האוכף"],
+                ["מַשְׂטֵמָה","איבה, שנאה עזה"],
+                ["נֹאד","שק עור לנוזלים, מימיה"],
+                ["נָאוֹר","מתורבת, משכיל"],
+                ["נֶאֱלַם","השתתק, נדם"],
+                ["נְאָצָה","גידוף, דברי בלע"],
+                ["נֶבֶט","צמח בראשית צמיחתו"],
+                ["נִבְעָר","בור, חסר השכלה"],
+                ["נָבַר","חיטט, פשפש"],
+                ["נִגַּר","נזל, זרם"],
+                ["נָהָה","רצה מאוד, השתוקק"],
+                ["נְהִי","בכי מר, יללה"],
+                ["נוֹאָל","טיפשי, אווילי"],
+                ["נוֹקֵד","מגדל צאן, רועה צאן"],
+                ["נוֹשֶׁה","מלווה"],
+                ["נְחִירָה","המתת בעלי חיים (בדרך כלל חזיר) על ידי דקירה"],
+                ["נִיר","אחו, שדה שנחרש"],
+                ["נַכְלוּלִי","רמאי, נוכל, מעורפל בכוונותיו"],
+                ["נָפָה","כלי בעל נקבים קטנים לניפוי קמח, מסננת","אזור, מחוז"],
+                ["נֵצֶר","בן, צאצא","ענף רך הצומח מהשורש"],
+                ["נָצַר","שמר, הגן"],
+                ["נָשִׂיא","ענן נושא גשם"],
+                ["נֶשֶׁךְ","ריבית"],
+                ["נִשְׁפֶּה","חלק ותלול"],
+                ["סַד","מכשיר עינוי קדום","לוח מיוחד המשמש לקיבוע ותמיכה באיבר פצוע"],
+                ["סַהַר","לבנה, ירח"],
+                ["סְחִי","אשפה, זוהמה, לכלוך"],
+                ["סֵיפָא","סוף, החלק האחרון (להיפך: רֵישָׁא)"],
+                ["סְפּוֹרָדִי","בלתי סדיר, אקראי, ללא חוקיות קבועה"],
+                ["סְפָר","גבול, קצה, רצועת אדמה החוצצת בין מדינות (יישובי ספר - יישובי גבול)"],
+                ["סְתַגְלָן","מי שמתאים עצמו בקלות למצבים חדשים, אדפטיבי"],
+                ["עָב","ענן"],
+                ["עֲבוֹתוֹת","חבלים עבים"],
+                ["עֲזוּבָה","מצב של הרס והזנחה"],
+                ["עֲלוּמִים","ימי הנעורים"],
+                ["עֲלָטָה","חושך, אפלה"],
+                ["עָשָׂה נְפָשׁוֹת","גייס תומכים למשהו"],
+                ["פּוּלְמוּס","ויכוח, מחלוקת"],
+                ["פּוּר","מזל, גורל"],
+                ["פּוּרְתָּא","מעט, קצת (נחמה פּוּרְתָּא - נחמה מועטה)"],
+                ["פֵּיד","אסון, צרה"],
+                ["פִּיל לָבָן","כינוי לפרויקט ענק שהושקע בו רבות אך אין בו שימוש"],
+                ["פִּילֵּל","ציפה, קיווה"],
+                ["פִּיסֵּחַ","צולע"],
+                ["פַּרְגּוֹד","סוג של מחיצה ניידת"],
+                ["פְּרוֹלוֹג","מבוא, הקדמה (להיפך: אפילוג)"],
+                ["פִּתְחוֹן פֶּה","אפשרות לומר דבר מה, הזדמנות לטעון משהו"],
+                ["צְבִיר","קבוצה (צביר עננים - קבוצת עננים)"],
+                ["צְדִיָּה","כוונה רעה, זדון"],
+                ["צַדְקָנוּת","תכונתו של הצדקן, גלגול עיניים"],
+                ["צָמִיג","סמיך, דביק"],
+                ["צִקְצוּק","קול הנוצר על ידי הנעת הלשון בין השיניים לחניכיים (לרוב מציין חוסר אישור או שלילה)"],
+                ["צָרוּף","מזוקק, ברור וטהור (תענוג צרוף - הנאה מוחלטת)"],
+                ["צָרַר","קשר יחד לחבילה","התנכל, התנהג באיבה כלפי מישהו, היה אויבו (צר - אויב)"],
+                ["קְבָסְתָּן","טרחן, מישהו שמעורר בחילה וגועל"],
+                ["קוֹבַע","קסדה"],
+                ["קוֹלָן","מכשיר המשמש לכיוון כלי נגינה"],
+                ["קִטְרֵג","האשים, הביא לדין"],
+                ["קִיקָיוֹנִי","זמני, ארעי"],
+                ["קָלוֹן","בושה, חרפה (אות קלון - סימן גנאי)"],
+                ["קְלוֹקֵל","שטיבו גרוע, איכותו ירודה"],
+                ["קִילֵּס","הילל, שיבח","קִילֵּל, לעג, השפיל, ביזה"],
+                ["קַנְטְרָן","סכסכן, נוהג להתגרות ולהרגיז"],
+                ["קִנְיָן","רכוש, נכס"],
+                ["קַפֶּנְדַּרְיָא / קַפַּנְדְּרְיָה","דרך קיצור"],
+                ["קַרְדּוֹם","מכשיר לחטיבת עצים, גרזן"],
+                ["קַרְפִּיף","שטח מגודר"],
+                ["רְבָב","כתם, פגם, מום מוסרי (ללא רבב - מושלם)"],
+                ["רָבִיד","שרשרת לצוואר, תליון"],
+                ["רָגַן","התלונן"],
+                ["רַהַב","התרברבות, גאווה"],
+                ["רָהוּי","הססני, חסר בטחון"],
+                ["רֵישָׁא","התחלה, החלק הראשון (להיפך: סֵיפָא)"],
+                ["רַכָּב","עֶגְלוֹן, \"נהג\" של כרכרה"],
+                ["רָגַל","ריכל"],
+                ["רָן","שר"],
+                ["רַפְרֶפֶת","סוג של קינוח אוורירי, פודינג"],
+                ["רָצַץ","שבר, ריסק, ניפץ"],
+                ["רָקַח","הכין תרופה או ריבה (מרקחת - ריבה, מרקחה - בּוֹשֶׂם)","המציא (סיפור לא אמיתי), הכין תכנית (בהקשר שלילי)"],
+                ["רָשׁ","עני"],
+                ["שִׁגָּיוֹן","מחשבה שאינה מרפה"],
+                ["שָׁהוּי","עיכוב, איחור"],
+                ["שׁוֹחֵר","חובב, מתעניין ב- (למשל: שוחר מדע)","נאמן, ידיד (למשל: שוחר שלום)"],
+                ["שׁוֹעַ","בעל הון, עשיר"],
+                ["שִׁיוַּוע","התחנן, זעק","היה זקוק למשהו נואשות"],
+                ["שָׁזַף","ראה, הביט","שרף, צרב"],
+                ["שָׁחוּחַ","כפוף"],
+                ["שָׁחוּן","חם ויבש"],
+                ["שַׁחַל","אריה צעיר"],
+                ["שִׁיפּוּי","ליטוש והחלקה של דבר מה בעזרת שופין, השחזה","תשלום כספי (לרוב כפיצוי)"],
+                ["שְׂכַלְתָן","אדם שחי את חייו על פי השכל וההיגיון במקום רגשות או אמונות, רציונליסט"],
+                ["שָׁנָה","עשה משהו שוב ושוב, חזר על פעולה מסוימת, למד, שינן"],
+                ["שְׁנִיוֹנִי","בעל חשיבות פחותה מעט מדבר אחר שהוא החשוב ביותר, משני"],
+                ["שִׁיסַּע","קָרַע (שִׁיסַּע את דברי חברו - קטע את דברי חברו)"],
+                ["שַׁעַל","פסיעה, צעד"],
+                ["שְׁתַדְלָן","מי שמנסה לשכנע אנשים לעשות דבר מה"],
+                ["תַּאֲנִיָּה וַאֲנִיָּה","בכי מר על אסון"],
+                ["תּוֹעַמְלָן","מי שעוסק בתעמולה, מי שמפיץ מסרים ברבים"],
+                ["תִּיחוּחַ","פירור האדמה בעזרת כלי כלשהו"],
+                ["תִּיתוֹרָה / תִּיתוֹרֶת","שולי הכובע, שוליים בולטים של חפץ כלשהו"],
+                ["תַּכְרִיכִים","בדים לבנים בהם עוטפים את המתים לפני הקבורה"],
+                ["תִּכְתּוֹבֶת","השם לכלל המכתבים שנשלחו מאיש לרעהו","החלפת מכתבים הדדית בין אדם למוסד כלשהו"],
+                ["תִּלֵּי תִּילִים","שפע רב"],
+                ["תְּמוּרָה","שינוי, מפנה, תהפוכות"],
+                ["תַּמְלִיל","טקסט"],
+                ["תְּנוּבָה","יבול, תוצרת חקלאית"],
+                ["תְּעוּדַת עֲנִיּוּת","עדות לחוסר יכולת"],
+                ["תִּיעֵל","הפנה לאפיק מסוים, כִּיווֵן","חפר תעלות לניקוז או השקיה"],
+                ["תְּעָל","רפואה"],
+                ["תַּשׁ","הפך לחלש, התעייף"],
+                ["תַּשְׁלִיל","סרט צילום ממנו מפיקים את התמונות, נגטיב"]
+            ],
+            8: [
+                ["אִבְחָה","ברק, נצנוץ","תנופה/הנפה מהירה של חרב"],
+                ["אֶבֶן הָרֹאשָׁה","מרכזי, חיוני","האבן שבמרכז הקשת (בבניין)"],
+                ["אֶבֶן נֶגֶף","מכשול, הפרעה (נגף - מחלה)"],
+                ["אֶבֶן פִּינָּה","דבר יסודי, עיקרי, אבן שמניחים ביסוד בניין חדש"],
+                ["אֶבֶן שׁוֹאֶבֶת","מגנט","מוקד משיכה, מוקד התעניינות המושך תשומת לב"],
+                ["אֶבֶן שָׂפָה","האבנים שבשולי הכביש, תחילת המדרכה"],
+                ["אַגַּב אוֹרְחָא","דרך אגב"],
+                ["אִדְרָה","עצם של דג"],
+                ["אוֹטוֹקְרַטְיָה","שלטון יחיד"],
+                ["אוּנְקְיָה","יחידת משקל, כ-29 גרם"],
+                ["אָזַר מָתְנָיו / חֲלָצָיו / חַיִל","התכונן למאבק (אזר - התמלא)"],
+                ["אַחֲרִית","קץ, סוף, סיום"],
+                ["אִיטֵּר (יַד יְמִינוֹ)","שמאלי"],
+                ["אַמְתַּחַת","תיק, תרמיל, ילקוט, שק, נרתיק, ארנק"],
+                ["אַסְפַּקְלַרְיָה","נקודת מבט, נקודת השקפה","מַרְאָה"],
+                ["אָפוּף","מוקף, עטוף"],
+                ["אַפִּרְיוֹן","כינוי לבית המקדש","חופה עשויה אריג, המשמשת בעיקר לקישוט","מושב כבוד שמעליו חופה ועליו נשאו בימי קדם אנשים נכבדים"],
+                ["אָצַר","העלים, החביא, הסתיר","שמר","הכיל בתוכו, נשא בחובו, החזיק"],
+                ["אֲרוֹמָה","ניחוח, ריח קל"],
+                ["אֹרַח","אופן התנהגות, דרך חיים, הליכות"],
+                ["אַרְכֻבָּה","בֶּרֶךְ","ידית כפופה בצורת ברך המשמשת להפעלת מכונה/מנוע"],
+                ["אֲרֶשֶׁת (פָּנִים)","הבעת פנים"],
+                ["אַשְׁמַאי","חוטא (לרוב בהקשר של חטא מיני)"],
+                ["בַּד","קורת עץ המשמשת לכתישת זיתים (בית בד - מקום בו כותשים זיתים), ענף, זרד, חוטר"],
+                ["בְּחֵרוּק שִׁינַּיִים","בזעם וברוגז תוך איפוק עצמי, בקושי"],
+                ["בְּיֶתֶר שְׂאֵת","בעוצמה רבה יותר"],
+                ["בִּכְפִיפָה אַחַת","ביחד, באותו המקום"],
+                ["בִּלְתִּי אֶמְצָעִי","ללא תיווך, ישיר"],
+                ["בִּלְתִּי נִדְלֶה","שאינו נגמר, אינסופי"],
+                ["בְּמֵישָׁרִין","באופן ישיר ללא תיווך, בלי הקדמות, ישר ולעניין"],
+                ["בְּעוֹד מוֹעֵד","בזמן, לא מאוחר מידי (מבעוד מועד - מספיק זמן לפני, לא ברגע האחרון)"],
+                ["בַּצַּר לוֹ","בזמן מצוקתו"],
+                ["גָּאָה","עָלָה, התרומם"],
+                ["גֵּב","גומה באדמה או בסלע שבה נקווים מי גשמים"],
+                ["גֹּב","בור, מאורה (גוב אריות - מאורת האריות)"],
+                ["גִּיבֵּן","בעל חטוטרת, אדם שגבו מעוקם"],
+                ["גִּינּוּי","מתיחת ביקורת על מעשה כלשהו"],
+                ["גָּלְמִי / גּוֹלְמִי","במצבו הטבעי לפני שעבר עיבוד, ראשוני, ברוטו"],
+                ["גַּרְדּוֹם","במה עליה מוציאים להורג (טעות נפוצה: קַרְדוֹם - גרזן)"],
+                ["גָּרוּם","רזה מאוד, בעל עצמות בולטות"],
+                ["דְּאָבוֹן","צער גדול"],
+                ["דּוֹמֶן","זבל אורגני (בעיקר צואה של אדם או בעל חיים)"],
+                ["הִבְכִּיר","הבשיל בתחילת העונה"],
+                ["הֲוָויָה","מציאות, ממשות"],
+                ["הוֹלֵל","החי חיי הוללות/שובבות לא מוסרית, החי את הרגע ומרבה בתענוגות ובבילויים פרועים"],
+                ["הֵחִישׁ (אֶת) צְעָדָיו / פְּעָמָיו","הגביר את קצב הליכתו, מיהר"],
+                ["הֶחֱרִישׁ","שתק, נאלם, דמם","השתיק, גרם לדממה"],
+                ["הִכָּה בְּאֶצְבַּע צְרֵדָה","השמיע נקישה בעזרת האמה והאגודל"],
+                ["הִכְפִּישׁ","דיבר בגנות"],
+                ["הָלַךְ בְּדֶרֶךְ כָּל בָּשָׂר / הָאָרֶץ","מת, נפטר"],
+                ["הִסְכִּין","התרגל, הסתגל"],
+                ["הֶעֱלָה עַל נֵס","פרסם, הפך דבר למופת, ציין לטובה"],
+                ["הָפַךְ אֶת עוֹרוֹ","שינה את דרך התנהגותו מקצה לקצה"],
+                ["הִרְכִּין","כפף, הטה כלפי מטה"],
+                ["הִשְׁלִיךְ נַפְשׁוֹ מִנֶּגֶד","סיכן את חייו בשביל משהו שהאמין בו"],
+                ["הִתְגַּלֵּעַ רִיב","הסתכסכו, התקוטטו, התעמתו"],
+                ["הִתְוָוה","תכנן בקווים כלליים מבלי להיכנס לדקויות","שרטט, רשם, סימן"],
+                ["הִתְנַגֵּחַ","ניהל ויכוח תקיף וחריף"],
+                ["הִתְרִיס","מחה, התנגד"],
+                ["זֵד","רשע, זדון"],
+                ["חָבוּשׁ","מי שיש לו כיסוי על הראש","כלוא, אסור","מי ששמו עליו תחבושת"],
+                ["חִידָּלוֹן","חורבן, הרס"],
+                ["חוּט הַשָּׁנִי","קו יסודי החוזר ונשנה לאורכו של עניין כלשהו"],
+                ["חֵט","שן השנהב הבולטת של הפיל"],
+                ["חֲטוֹטֶרֶת","גִבְנוּן, בליטה בגב, דבשת"],
+                ["חֹסֶן","כוח"],
+                ["חֲסַר פְּנִיּוֹת","אובייקטיבי, הגון, לא משוחד"],
+                ["חֲפָתִים","כפתורים לרכיסת קצה השרוול","כינוי לקפל בשרוול","החלק הקיצוני בשרוול"],
+                ["חֲרוֹן (אַף)","כעס, זעם"],
+                ["חַת","נבהל, התמלא פחד"],
+                ["טֶלֶף","פרסה"],
+                ["טְרַנְסְפוֹרְמַצְיָה","שינוי צורה, שינוי תכונות"],
+                ["יָצוּל","מוט בקצה של מחרשה או עגלה שרותמים אליו את הבהמה"],
+                ["כָּל אֵימַת שֶׁ-","בכל זמן ש-"],
+                ["כְּפִיפוּת","מצבו של מי שנמצא תחת סמכותו ופיקודו של אחר"],
+                ["כּוֹפֶר","תשלום שנדרשים לשלם על מנת להציל חיי אדם"],
+                ["לָא מִינֵּיהּ וְלָא מִקְצָתֵיהּ","שגוי לחלוטין (לא ממנו ולא קצת ממנו)"],
+                ["לַבִּירִינְתְּ","מבוך"],
+                ["להד״ם","בדיוני, ראשי התיבות של \"לא היו דברים מעולם\""],
+                ["לִיבְּרָה","יחידת משקל"],
+                ["לַיִשׁ","אריה צעיר"],
+                ["לְמַכְבִּיר","הרבה, בשפע"],
+                ["לְמִצְעָר","לפחות"],
+                ["לְמַרְאִית עַיִן","לכאורה"],
+                ["לַעַז","רכילות"],
+                ["מַאֲוַויִּים","משיכה עזה, תאווה"],
+                ["מְבוּדָּר","מפוזר"],
+                ["מֻבְלַעַת","שטח אדמה שנמצא בשליטת מדינה אחת ומוקף בשטחי מדינה אחרת"],
+                ["מִבְּעוֹד מוֹעֵד","מספיק זמן לפני, לא ברגע האחרון (בעוד מועד - בזמן, לא מאוחר מידי)"],
+                ["מְדוּכָה","גליל המשמש לשיגור מטעני נפץ","קערה המשמשת לכתישה בעזרת עלי (מוט בצורת גליל)"],
+                ["מְהַדְּרִין","מי שמקפיד על כל פרט ופרט, דקדקן"],
+                ["מַחַט","עלה צר, קשה ומחודד"],
+                ["מָחַט","קינח (את האף)"],
+                ["מַחְתָּה","כל אחד מהכלים המשמשים לטיפול באח (יעה, מגרפה וכו')","כלי להעברת גחלים חמים ממקום למקום"],
+                ["מַטְרוֹנָה / מַטְרוֹנִית","גברת נכבדה"],
+                ["מִיָּמִים יָמִימָה","מזה זמן רב, מאז ומעולם"],
+                ["מִנִּי אָז","מאז"],
+                ["מְסוֹבָב","פועל יוצא, תוצאה"],
+                ["מִקַּדְמַת דְּנָא","מאז ומעולם, מאז ומתמיד"],
+                ["מְרוּפָּט","קרוע ובלוי, משומש"],
+                ["מִשְׁבָּר","גל"],
+                ["מַשְׁמִים","משעמם, שגרתי"],
+                ["נִבְכֵי נַפְשׁוֹ","תוך תוכו (נאמר על אדם)"],
+                ["נִדְרַשׁ","עסק בעניין מסוים"],
+                ["נְהָרָה","אור, זוהר"],
+                ["נַחְתּוֹם","אופה, בעל מאפיה"],
+                ["נִיכָּר","נראה לעין, בולט"],
+                ["נְסִיקָה","התרוממות, המראה"],
+                ["נִיעֵר (אֶת) חָצְנוֹ מ-","התנער מאחריות, התנער מהקשר אליו (חצנו = שולי הבגד)"],
+                ["נֶעְתְּקוּ מִילִּים מִפִּיו","לא השמיע קול, שתק"],
+                ["נַפְשׁוֹ יָצְאָה","רצה מאוד, השתוקק"],
+                ["סִדְקִית","שם כולל לחפצים קטנים (בייחוד כלי תפירה)"],
+                ["סִילוּף","עיוות הדברים כך שייראו בצורה שונה מן המציאות"],
+                ["סָנַט","לעג, הִקְנִיט, התגרה"],
+                ["סְפּוֹנְטָנִי","ללא תכנון"],
+                ["עוֹל","נטל, מעמסה","זוג מוטות המחוברים לבהמה ומשמשים ככן לשאר אביזרי הרתמה"],
+                ["עֶלֶם / עַלְמָה","בחור צעיר / בחורה צעירה"],
+                ["פֵּאָה","דופן של גוף תלת-מימדי, פינה","קווצת שיער מצידי הראש (פאות לחיים)"],
+                ["פַּח (יָקוּשׁ)","מלכודת, מכמונת"],
+                ["פִּיתּוֹם","מי שמדבר מהבטן ללא הנעת השפתיים"],
+                ["פָּכַר","שבר, לחץ, מעך"],
+                ["פָּכַר אֶת יָדָיו / אֶצְבְּעוֹתָיו","שילב את אצבעותיו בחוזקה כביטוי לכעס או לצער רב"],
+                ["פְּלוּגְתָּא","מחלוקת, ריב, חילוקי דעות"],
+                ["פְּלוֹנִי","מישהו בלתי ידוע, אלמוני"],
+                ["פַּלָּצוּת","זעזוע עמוק, פחד עז"],
+                ["פָּרִיץ","אציל, בעל אחוזה שיש לשלם לו מיסים","מושחת, חסר מוסר"],
+                ["פַּרְסָה","חומר דמוי ציפורן המכסה את טלפי הבהמה"],
+                ["פֶּשֶׁר","משמעות, פירוש (חסר פשר - לא מובן)"],
+                ["צוֹרֵף","אמן שעוסק בעיצוב מתכות יקרות לתכשיטים, תכשיטן"],
+                ["צַלְיָן","עולה לרגל"],
+                ["צָפוּד","מקומט, יבש ומצומק, מכווץ"],
+                ["צַרְכָנִיָּה","חנות המנוהלת ע\"י ארגון חברים ללא מטרת רווח (מוכרת בעיקר מזון) או חנות מכולת קטנה"],
+                ["קְבָס / קֶבֶס","בחילה, גועל"],
+                ["קִיטּוּב","ניגוד"],
+                ["קִיפֵּחַ","שָׁכַל, איבד (קיפח את חייו - מת)","גבוה מאוד, ענק","הפלה לרעה"],
+                ["קַלּוּת רֹאשׁ","התייחסות מזלזלת שלא נותנת את הכבוד הראוי לנושא, קלות דעת"],
+                ["קְנוֹקֶנֶת","איבר בצמח הדומה לחוט אשר נכרך סביב עצמים ומאפשר לצמח לטפס"],
+                ["קַצְרָנוּת","שיטת כתיבה מקוצרת ומהירה לרישום פרוטוקולים (בעיקר בבית-משפט)"],
+                ["קֶרֶן יַעַר","כלי נשיפה ממתכת"],
+                ["רַחַשׁ","תנועה, רשרוש"],
+                ["רָחַשׁ","הרגיש, חש (רוחש כבוד - מכבד)","שקק, היה מלא חיים"],
+                ["רֶמֶץ","אפר חם שיש בו ניצוצות אש, גחלים"],
+                ["רֶפוֹרְמָה","שינוי יסודי ומקיף, תיקון הדברים מיסודם"],
+                ["שָׁבִיס","כיסוי ראש לנשים"],
+                ["שִׁיוָוה","הקנה לו"],
+                ["שַׁוֵּוה בְּנַפְשְׁךָ","תאר לעצמך"],
+                ["שְׁוֵוה נֶפֶשׁ","אדיש"],
+                ["שַׁחֲרִית","אחת משלוש התפילות שיהודי חייב בהן מדי יום","שעות הבוקר, זריחה"],
+                ["שִׁינֵּס","קשר חגורה סביב המותניים, חגר"],
+                ["שָׁעָה","התייחס, שם לב (לא בהכרח הסכים לבקשה) (להיפך: התעלם)"],
+                ["שָׁפוּף","כפוף"],
+                ["שָׁרִיר וְקַיָּים","ידוע וברור מעבר לכל ספק, ודאי"],
+                ["שַׂרְעַפִּים","מחשבות, הרהורים"],
+                ["תַּבְלִיט","צורת פני האדמה","סוג של פסל הבולט מהמשטח החלק עליו הוא מפוסל"],
+                ["תּוֹחֶלֶת","תקווה, סיכוי (חסר תוחלת - חסר סיכוי, חסר טעם)","ממוצע משוקלל של מספר תוצאות (מונח בסטטיסטיקה)"],
+                ["תִּינָּה","התאבל"],
+                ["תִּינָּה (אֶת צָרוֹתָיו)","השמיע את צרותיו באוזני מישהו"],
+                ["תַּמְלוּגִים","תשלום עבור שימוש בזכויות יוצרים"],
+                ["תַּעֲרִיף","המחיר שיש לשלם בתמורה לדבר מה, שער"],
+                ["תִּקְרוֹבֶת","כיבוד"]
+            ],
+            9: [
+                ["אֶבֶן יְסוֹד","דבר מרכזי במשהו, מרכז הכובד"],
+                ["אַבְּסוּרְדִי","חסר היגיון, שטותי, דבר שאינו מתקבל על הדעת"],
+                ["אַדְרַבָּה","ההיפך הוא הנכון","למה לא? יופי!"],
+                ["אוֹב","קסם, כישוף"],
+                ["אוֹטוֹרִיטָה","סמכות הנובעת מידע בתחום מסוים"],
+                ["אוֹרַח","מנהג, אופן התנהגות, דרך חיים"],
+                ["אֵין תּוֹכוֹ כְּבָרוֹ","צבוע, שקרן"],
+                ["אִיֵּישׁ","הציב אנשים למילוי תפקיד מסוים"],
+                ["אִישׁ אֶשְׁכּוֹלוֹת","אדם הבקי בתחומים רבים ושונים"],
+                ["אֶנִיגְמָה","תעלומה, חידה"],
+                ["אַפְרַקְדָּן","שכוב על הגב"],
+                ["אֶשְׁתָּקַד","בשנה שעברה"],
+                ["אֶתְנַחְתָּא","הפסקה, פסק זמן"],
+                ["בְּחוּבּוֹ","בו, בתוכו"],
+                ["בִּיזָארִי","מוזר, לא נורמאלי"],
+                ["בִּיכָּה","ספד, קונן והתאבל על מת"],
+                ["בַּלְדָּר","שליח, דוור, רץ"],
+                ["בָּלוּי","שחוק, מרופט, ישן וקרוע"],
+                ["בְּנַפְשׁוֹ הַדָּבָר","עבורו מדובר בדבר חיוני וגורלי בבחינת ייהרג ובל יעבור"],
+                ["בִּיקֵּשׁ עַל נַפְשׁוֹ","התחנן על חייו"],
+                ["גְּדִיל","קצוות חוטים היוצאים משולי הבגד"],
+                ["גִּדֵּם / גִּדֵּעַ","קטוע יד"],
+                ["גֶּדֶם / גֶּדַע","גזע העץ שנשאר לאחר כריתה, חלק מאיבר שנשאר לאחר קטיעה"],
+                ["גָּדַם / גָּדַע","כרת, חטב, קטע"],
+                ["גְּלִימָה","בגד עליון ארוך"],
+                ["גָּמַר עָלָיו אֶת הַהַלֵּל","שיבח אותו"],
+                ["דִּבְרֵי חֲלָקוֹת","דברי חנופה, לשון חלקות"],
+                ["דָּחָה אוֹתוֹ בְּקַשׁ","התחמק מלתת תשובה בתירוץ קלוש"],
+                ["דֹּחַק","מצב של מחסור ומצוקה","צפיפות"],
+                ["דָּמַם","השתתק, לא הוציא הגה","הפסיק לזוז, נרגע, שקט"],
+                ["הֶאֱפִיל","עלה עליו ביכולתו","החשיך, הקדיר"],
+                ["הֲגַם שֶׁ-","למרות שֶׁ-, אף על פי, אם כי"],
+                ["הֵחִישׁ","האיץ, זירז"],
+                ["הֶחֱשָׁה","לא השמיע קול, שתק, דמם, לא התערב"],
+                ["הִכְלִים","בייש, הביך, הלבין את פניו, עלב"],
+                ["הִכְתִּיר","הסמיך מלך חדש"],
+                ["הִמְרָה אֶת פִּיו","נהג בניגוד להוראתו"],
+                ["הֵסִיר אֶת הַלּוֹט","חשף, גילה, פרסם (לוט - כיסוי)"],
+                ["הִסְתּוֹפֵף","שהה באופן ממושך במקום מסוים או בחברת אנשים מסוימים"],
+                ["הִסְתּוֹפֵף בְּצִלּוֹ","היה לתלמידו (הסתופף - שהה במחיצת אנשים)"],
+                ["הֶעֱרָה","גילה, חשף","שתה, לגם"],
+                ["הִצְמִית","השמיד, חיסל, החריב"],
+                ["הִקְצָה","ייעד משהו למטרה מסוימת, הקציב, הפריש"],
+                ["הִרְעִים","הרגיז, הביא לידי כעס","השמיע קול רעם, הרעשה"],
+                ["הִתְאוֹנֵן","התלונן"],
+                ["הִתְגַּפֵּף","התחבק מתוך אהבה, התרפק, התלטף"],
+                ["הִתְנַגֵּחַ","כשנאמר על בעל חיים: נאבק בעזרת קרניו"],
+                ["הִתְקִין","הכין, סידר, יצר","קבע תקנה, חוקק"],
+                ["וַורְיָאצְיָה","נוסח, גרסה"],
+                ["וִירְטוּאוֹז","המצטיין בשלמות במקצועו, בעל רמת ביצוע גבוהה במיוחד"],
+                ["זִיכָּיוֹן","זכות מיוחדת לדבר מה"],
+                ["זַלְזַל","ענף"],
+                ["חָפַן","תפס דבר מה בכף ידו"],
+                ["חֹפֶן","מידת נפח המסמלת את הכמות שניתן להחזיק בכף יד קמוצה"],
+                ["חָרַץ","גזר, פסק, קבע","שרט, עשה חריץ במשטח"],
+                ["טְפִיפָה","הליכה בצעדים קלים תוך התנדנדות, צעידה מרחפת"],
+                ["טַרְזָנִי","גנדרני, מתלבש בהידור"],
+                ["יִיעוּד","הקצבת דבר או אדם למטרה מסוימת, הקדשה, ייחוד","שליחות, כוונה, תכלית"],
+                ["יָצָא חוֹצֵץ","התנגד בתוקף"],
+                ["יָצָא לָשׂוּחַ","יצא לטייל"],
+                ["כִּילַי","קמצן"],
+                ["כָּמוּס","מוסתר, חסוי, מוחבא"],
+                ["כָּפַר","לא הסכים עם דבר מקובל","התכחש לקיום האל","לא הודה בהאשמות המיוחסות לו"],
+                ["כְּרוּב","מלאך"],
+                ["לָאַט","לחש, דיבר לאט ובלחש"],
+                ["לוֹט","כיסוי, מעטה"],
+                ["לוּט","מכוסה, עטוף","מצורף, נספח"],
+                ["לוּט בָּעֲרָפֶל","שאינו ברור, מעורפל"],
+                ["לָחַךְ","נגע קלות (כשנאמר על גלים, אש וכו')","כשנאמר על חיה: אכל עשב","שרף לחלוטין, כילה"],
+                ["לְלֹא כָּחָל וְסָרָק","כמו שהוא מבלי להוסיף או לגרוע, ללא קישוטים ותוספות"],
+                ["לְמַפְרֵעַ","לאחר מעשה, על מה שהיה"],
+                ["לְמִשְׁעִי","באופן נקי ביותר, באופן חלק"],
+                ["לִסְטִים","שודד, גנב"],
+                ["לִפְנֵי וְלִפְנִים","באופן יסודי ומעמיק"],
+                ["מִגְדָּנוֹת","דברי מתיקה (אפשר גם: מגדנים)"],
+                ["מָגוֹף / מְגוּפָה","ברז, פקק, שסתום ויסות"],
+                ["מוּבְהָק","ניכר בבירור, בולט, אופייני, טיפוסי, ייצוגי"],
+                ["מוּפְשָׁט","ערטילאי, נטול גשמיות (להיפך: מוחשי)"],
+                ["מִינוּת","כפירה בדת, כפירה בעיקר"],
+                ["מְלוּבָּן","מובהר, מוסבר, מפורש"],
+                ["מִנְשָׁר","הצהרה, כרוז"],
+                ["מַעֲקָשׁ","מכשול, סיבוך","מפותל, שאינו מישורי"],
+                ["מְשׁוֹבֵב נֶפֶשׁ","מהנה ביותר, נעים"],
+                ["מִשְׁנֶה","כפול ומכופל, רב מאוד (משנה תוקף, משנה חשיבות)"],
+                ["מִתְוֶוה","שרטוט או רישום בקווים כלליים, סקיצה"],
+                ["נֵאוֹת","הסכים"],
+                ["נָאוֹת","מתאים, ראוי, הולם"],
+                ["נֹגַהּ","אור, זוהר"],
+                ["נָד / הִתְנוֹדֵד","נע, מתנועע"],
+                ["נִדְבָּךְ","דרגה בהתפתחותו של דבר מה, שלב, שכבה"],
+                ["נִטַּשׁ","התחולל, התפשט"],
+                ["נִכְמַר לִבּוֹ","ריחם, חס"],
+                ["נָסַךְ","יצק נוזלים לצורך פולחן דתי, התיך","השרה, יצר אווירה מסוימת"],
+                ["נִקְהַל","נקבץ, נאסף"],
+                ["נִקְרָה","סדק רחב בסלע או בהר, נַקִיק","הזדמן, הגיע למקום או נפגש עם מישהו באקראי, באופן לא מתוכנן (נקרה בדרכו)"],
+                ["סְבָרָה","דעה רווחת, השערה"],
+                ["סוֹלְלָה","גבעה מלאכותית מוארכת","יחידת תותחים"],
+                ["סָלַד","הרגיש דחייה כלפי משהו, נגעל"],
+                ["סָעַד","סייע, טיפל"],
+                ["סָעַד (אֶת) לִבּוֹ","אכל, השביע רעבונו"],
+                ["סָפַק אֶת כַּפָּיו","מחא כף מתוך צער או אכזבה"],
+                ["עַבְדְּקָן","בעל זקן עבה ומגודל"],
+                ["עֲבוֹט","חפץ בעל ערך הניתן למשכון בתמורה להלוואה, ערבון"],
+                ["עִוְועִים","תעתועים, שיגעון (רעיונות עִוְועִים - רעיונות מטורפים)"],
+                ["עוֹפֶר","אייל או צבי צעיר","כשנאמר על אדם: עלם חמד, צעיר"],
+                ["עַמּוּד הַתָּוֶוךְ","דבר מרכזי במשהו, מרכז הכובד"],
+                ["עֵרָה","מזג, שפך נוזל","הרס, החריב","חשף, גילה"],
+                ["פּוֹאֵרָה / פְּאָרָה","ענף"],
+                ["פּוֹחֵז","חסר אחריות, פזיז, נמהר"],
+                ["פֶּלֶךְ","כישור, מוט המשמש לטוויית חוטים","אזור, מחוז"],
+                ["פִּנְכָּה","קערה, צלוחית, פלטה (מְלַחֵךְ פִּנְכָּה - מתחנף)"],
+                ["פָּס","עבר מן העולם, תם"],
+                ["פָּקַד","בא, ביקר מישהו","סָפַר, מנה","ציווה, הורה"],
+                ["פַּרְסָה","מידת אורך קדומה"],
+                ["צָבָא","התאסף, התקהל"],
+                ["צוֹעֵר","חניך בית ספר לקצינים","עוזר, סגן"],
+                ["צוּר","סלע גדול"],
+                ["צוּר מַחְצַבְתּוֹ","מקורו, מולדתו, המקום שממנו בא ואליו הוא משתייך"],
+                ["צִיָּה","מדבר, שממון"],
+                ["צָנוּף","מגולגל, מכורבל, מכווץ","כרוך סביב הראש"],
+                ["צַר","אויב, שונא","חֲבָל, מצער","לא רחב, מצומצם"],
+                ["קַב","מידת נפח קדומה"],
+                ["קְדֵרָה","כלי לבישול, סיר"],
+                ["קוֹלֵגָה","חבר למקצוע, עמית"],
+                ["קָטוּם","שנכרת ונקצץ ראשו"],
+                ["קָם","אויב","נבנה, יוסד","התעורר, פקח עיניים"],
+                ["קַנְקַן זָפוּת","בעל זיכרון טוב (כמו קנקן שחוריו סתומים בזפת ואינו דולף)"],
+                ["קְסַרְקְטִין / קְסַרְקָט","מחנה צבאי, מגורי חיילים"],
+                ["קָרוּץ","עשוי מ-"],
+                ["רָבַץ לְפִתְחוֹ","נמצא בסביבתו הקרובה","ארב לו"],
+                ["רֵיאָלִי","ישים, אפשרי","מציאותי"],
+                ["רַעֲמָה","המון שיער","שיער ארוך הגדל על העורף של בעל חיים"],
+                ["רָצַע","עשה חור (מַרְצֵעַ - מכשיר לניקוב חורים)"],
+                ["שָׁוְא","שקר וכזב (לרוב מופיע בצירופי סמיכות כגון \"תלונת שווא\")"],
+                ["שָׁוֶוה לְכֹל נֶפֶשׁ","כל אחד יכול להרשות לעצמו, זול","מתאים לכל אחד, פשוט"],
+                ["שֶׁנֶץ","רצועה, שרוך"],
+                ["שֶׁצֶף","זרם חזק, שטף","כעס, זעם"],
+                ["שְׁרִירוּת","אופן התנהגותו של מי שפועל לפי גחמותיו גם אם הן פוגעות באחרים"],
+                ["שְׁרִירוּת לֵב","עקשנות, התנהגות חסרת היגיון והתחשבות"],
+                ["שְׁרִירוּתִי","בנוי על דעה בלתי מבוססת או רצון עיקש שאין לו הצדקה אמיתית"],
+                ["שָׂרָף","כינוי לנחש ארסי","מלאך"],
+                ["תּוֹאֲנָה","סיבה, תירוץ"],
+                ["תּוֹכָחָה / תּוֹכֵחָה","דברי מוסר, עונש"],
+                ["תּוֹלָדָה","תוצאה, מסקנה, דבר שהסתעף מדבר עיקרי"],
+                ["תְּכִיפוּת","תדירות, נפיצות"],
+                ["תָּכַף","התרחש לעתים קרובות, בתדירות גבוהה"],
+                ["תָּר","ריגל, בלש אחרי, עקב","חיפש, ביקש","סייר, טייל"],
+                ["תְּשׁוּרָה","מתנה, מנחה, שי"]
+            ],
+            10: [
+                ["אַבְנֵט","חגורה רחבה"],
+                ["אַבְקָן","חלק בפרח המכיל אבקה המשמשת להפריית פרח"],
+                ["אַבְרֵךְ","כינוי לאיש צעיר, כיום נפוץ ככינוי לבחור הלומד בישיבה (אַבְרֵךְ - אב בַּחָכְמָה רַךְ בְּשָׁנִים)"],
+                ["אוֹטוֹבִּיּוֹגְרַפְיָה","תולדות אדם הכתובות בידי עצמו"],
+                ["אוֹמְנִיפּוֹטֶנְטִי","כל-יכול"],
+                ["אֻשְׁיּוֹת","מסד, בסיס, יסוד"],
+                ["אָזַר עֹז / כֹּחַ / אֹמֶץ","הֵעֵז (אזר - התמלא)"],
+                ["אָחַז אֶת הַשּׁוֹר בְּקַרְנָיו","פנה מיד לטפל בעניין"],
+                ["אִידֵאָל","שיא השלמות, דבר שרוצים להשיגו"],
+                ["אִיּוּשׁ","הצבת אנשים במקום מסוים על מנת שיבצעו מטלה מסוימת"],
+                ["אִינְהֶרֶנְטִי","פנימי, טבוע (בתוך)"],
+                ["אֵיפָה","מידת נפח עתיקה"],
+                ["אִישׁ מָדוֹן / מְדָנִים","סכסכן"],
+                ["אִיכּוּל","שריפה, בערה"],
+                ["אֲנֶקְדּוֹטָה","בדיחה, קוריוז"],
+                ["אֲסוּפָה","מקבץ מאמרים בנושא מסוים"],
+                ["אַפְסָר","רסן, רתמה"],
+                ["אָקוּטִי","מהותי, חריף, חמור"],
+                ["אָרִיחַ","לוח אבן בעל צורה מלבנית המשמש לכיסוי הרצפה או הקירות, מִרְצֶפֶת, בלטה"],
+                ["אָרִיס","אדם המקבל לידיו חזקה על אדמה ומעבד אותה בתמורה לאחוז מסוים מהיבול"],
+                ["אֶשְׁכָּר","מתנה, שי"],
+                ["בְּחִישָׁה","ערבוב"],
+                ["בִּיכֵּר","העדיף"],
+                ["בִּכּוּרִים","ראשית התבואה, היבול הראשון (פירות ראשונים ואף ספר ראשון של סופר)"],
+                ["בְּלִי מֵשִׂים","בלי לשים לב, כבדרך אגב"],
+                ["בִּלְתִּי נִלְאֶה","נאמר על אדם שעושה משהו במרץ והתמדה ולא מראה סימני עייפות"],
+                ["בִּמְבֵּם","פיזם מנגינה ללא מילים, זמזם, המהם"],
+                ["בְּצַוְותָּא","ביחד, עם עוד אנשים"],
+                ["בַּר-חֲלוֹף","זמני וחולף, עראי"],
+                ["בְּרַם","אולם, אבל, אך, ועם זאת"],
+                ["גַּבִּין","גַּבָּה (גבינים - גבות)"],
+                ["גַּחְמָה","קפריזה, שיגעון לדבר מסוים, דחף פתאומי למשהו (גחמני = קפריזי)"],
+                ["גְּלָלִים","צואת בעלי החיים"],
+                ["גַּלְמוּד","בודד, עזוב"],
+                ["גִּינּוּנִים","כללי התנהגות טקסית ומנומסת המקובלים בחברה כלשהי"],
+                ["גַּשְׁמִי","שניתן לתפיסה בעזרת החושים, חומרי, מוחשי, ממשי, ארצי"],
+                ["דָּא עָקָא","זו הצרה, זו הבעיה"],
+                ["דָּהוּי","שצבעו נחלש והחוויר"],
+                ["דּוֹבְרָה","סירה להעברת משאות, רפסודה"],
+                ["דְּפוּס","תבנית אופיינית להתנהגות אדם או תהליך שיטתי כלשהו, מודל, טיפוס"],
+                ["דֹּק","שכבה דקה, קרום, ציפוי, כיסוי, מעטה"],
+                ["הֶאֱצִיל","העביר סמכות לאחר, העביר תכונה לאחר"],
+                ["הֶגְמוֹנְיָה","שליטה, שלטון עליון, עליונות"],
+                ["הוּדְרְכָה מְנוּחָתוֹ","היה טרוד, משהו הפריע לו"],
+                ["הוֹלֵךְ בַּתֶּלֶם","הולך לפי המקובל, נוהג בדיוק כפי שציוו עליו"],
+                ["הֵחִיל","העניק תוקף לחוק או תקנה"],
+                ["הָיָה בְּעוֹכְרָיו","הדבר היה לרעתו, הכשיל אותו"],
+                ["הִכְפִּיף","שם מישהו תחת מרותו של מישהו אחר"],
+                ["הַלָּה","ההוא, המדובר"],
+                ["הֵלִין","התלונן"],
+                ["הַלְמוּת","דפיקה בקצב קבוע, מכה, נקישה"],
+                ["הִלְעִיז","השמיץ, פרסם שקרים הפוגעים בשמו של מישהו"],
+                ["הִמְצִיא","הציג, הגיש"],
+                ["הִנְפִּיק","הוציא שטרי כסף או איגרות חוב לציבור הרחב (לרוב נאמר על בנק)","המציא ומסר לידי מישהו תעודה רשמית כלשהי"],
+                ["הִסְתַּיֵּיג","לא הסכים עם משהו, טען נגד, דחה"],
+                ["הִשְׁלִיךְ יְהָבוֹ עַל","תלה תקוותו ב-"],
+                ["הִתְבַּדְּרוּת","השתעשע (מהמילה בידור)","התפזר (שיערה התבדר ברוח)"],
+                ["הִתְחַקָּה","ניתח ובחן, חקר","עקב אחריו, ריגל"],
+                ["הִתְלַהֵם","התכתש, השתולל, התנהג בתוקפנות"],
+                ["הִתְנוֹדֵד","נע מצד לצד בחוסר יציבות"],
+                ["הִתְנוֹפֵף","התנועע ברוח מצד לצד"],
+                ["הִתְקַשֵּׁט בְּנוֹצוֹת זָרִים","התפאר בדבר מה שלא הוא עשה, או בדבר שאינו שלו"],
+                ["זִבְדָּה","שמנת"],
+                ["זְמָם","מחסום ששמים בפי בהמה בכדי למנוע ממנה לאכול או לנשוך"],
+                ["חֲגָוִים","נקיקים, סדקים, חריצים"],
+                ["חֲוִילָה","וילה, קוטג'"],
+                ["חוֹסֶה","מי שנמצא במוסד טיפולי (בשל נכות, זקנה וכו')"],
+                ["חִיוַורְיָין","מעט חיוור, לבנבן"],
+                ["חִיל (וּרְעָדָה)","פחד גדול, אימה"],
+                ["חַכְלִילִי","אדמדם, אדמוני, סמוק"],
+                ["חָמָס","שוד, גניבה, גזל"],
+                ["חָרוּל","קוץ"],
+                ["חָרוּשׁ","שיש בו, שיש בו סימנים של (חרוש קמטים, חרוש דאגה)"],
+                ["חָרִיץ","נתח, חתיכה, פרוסה (חָרִיץ גְּבִינָה - חתיכת גבינה)"],
+                ["חִישּׁוּל","עיצוב תכונות המתכת על ידי ליבונה","חיזוק אדם מבחינה מנטאלית, חיסון, הקשחה"],
+                ["טָרוּף","חסר שקט (שינה טרופה - שינה לא שלווה)"],
+                ["יְהָב","תקווה, סיכוי (השליך יהבו על מישהו - תלה בו תקוות)"],
+                ["יוֹרֵד יָם","יַמַּאי, סַפָּן, מַלָּח"],
+                ["כּוֹחוֹ יָפָה","יש לו תוקף"],
+                ["כִּיּוּר","חריטה על הקיר לשם נוי","עיצוב צורות מחומר רך כלשהו (פלסטלינה, חימר...)"],
+                ["כְּלוֹנָס","מוט, קורה ארוכה ודקה"],
+                ["כִּינוּן","הקמה, ביסוס"],
+                ["לְאַלְתַּר","באופן מיידי, על המקום, תכף ומיד"],
+                ["כִּיתֵּר","הקיף מכל הצדדים"],
+                ["כִּימֵּת","מלשון כמות - ביצע מדידת כמות, מדד"],
+                ["לִיבָּה אֶת הַיְּצָרִים","עורר סערת רגשות, הלהיט את הרוחות"],
+                ["לִבְלוּב","פריחת ניצנים (להיפך: קמל)","התפתחות מבטיחה של רגשות חיוביים"],
+                ["לְמֵישָׁרִין","כמו שצריך, ללא כל בעיה"],
+                ["לְסֵרוּגִין","פעם כך ופעם אחרת, לא באופן רציף"],
+                ["מוֹעֵד","זמן","חג"],
+                ["מַהֲדִיר","מי שמוציא ספר ישן במהדורה חדשה, מי שעורך ספר לדפוס"],
+                ["מַדְמֵנָה","מזבלה, אדמה בוצית"],
+                ["מַדְוֶה","כאב"],
+                ["מִגְבַּעַת","כובע רחב שוליים"],
+                ["מַבְכִּירָה","אישה או בהמה המביאה לעולם את צאצאה הראשון (הבכור)"],
+                ["מוֹרֶךְ (לֵב)","חולשה, פחד"],
+                ["מִזְכָּר","מכתב קצר ולא רשמי בנוגע לעניין מסוים"],
+                ["מַחְמָל","דבר המעורר חמלה ואהבה (מַחְמַל נַפְשׁוֹ = יקירו, אהובו)"],
+                ["מְטוּלָּל","רטוב מטל"],
+                ["מְטוּרְזָן","הדור בלבושו, מגונדר"],
+                ["מְכוּרְכָּם","בצבע צהוב-כתום (כצבע הצמח כורכום)"],
+                ["מָשׁ","זז, נע"],
+                ["מַסָּה","חיבור עיוני קצר"],
+                ["מִסְדָּר","התאחדות של אנשים על יסוד רקע משותף"],
+                ["מִלְטָשָׁה","בית מלאכה לליטוש שיש, אבני חן וכו'"],
+                ["מַתְמִיהַּ","מוזר, תמוה, מעורר פליאה, מדהים"],
+                ["מִשֶּׁכְּבָר הַיָּמִים","מלפני זמן רב"],
+                ["מַשְׂאַת לֵב / נֶפֶשׁ","שאיפתו ותקוותו של אדם, חלום"],
+                ["נֶאֱלָח","מתועב, בזוי"],
+                ["נָגַשׂ","דחק במישהו, רדה בו, דיכא אותו","דרש שהאדם שחייב כסף יחזיר את חובו"],
+                ["נוֹחַ לַבְּרִיּוֹת","שקל להסתדר איתו, טוב מזג"],
+                ["נוֹפֶךְ","אחת מאבני החושן","תוספת קלה ועדינה למשמעות או למראה של דבר מה, ניואנס"],
+                ["נְיוּאַנְס","הבדל דק"],
+                ["נִפְרַע","שולם","נקם (במישהו)"],
+                ["נִכְסָף","דבר רצוי מאוד, שמשתוקקים אליו, נחשק"],
+                ["נִיחָר","יבש, בעיקר בהקשר של גרון יבש מדיבור"],
+                ["נִיצַּחַת","נחרצת, מכרעת"],
+                ["סָדוּר","מסודר, מאורגן"],
+                ["סִידּוּר","ספר המכיל את התפילות"],
+                ["סוּרֵיאָלִיסְטִי","לא מציאותי"],
+                ["סָמוּךְ עַל שׁוּלְחָנוֹ","נהנה מחסדיו, נתמך על ידו"],
+                ["סָמַךְ יָדוֹ עַל (משהו)","אישר, הסכים"],
+                ["סָר מֵרַע","מי שנמנע מלחטוא"],
+                ["סְרָק","ריקנות, חוסר תועלת (רעיון סרק - רעיון בלתי מעשי)"],
+                ["עָלָה בְּקָנֶה אֶחָד","תאם, השתלב"],
+                ["עָמִיל","סוכן"],
+                ["עֲנָק","תכשיט לצוואר, מחרוזת"],
+                ["פָּג","התנדף, הסתיים (פג תוקף - עבר התוקף, לא בתוקף), נעלם"],
+                ["פַּג","תינוק שנולד לפני הזמן המיועד"],
+                ["עַרְכָּאָה","שם לדרגה בבית המשפט (שלום, מחוזי או עליון), שלב, רמה"],
+                ["פּוֹרֵק עֹל","מי שנוהג בהפקרות ואינו מקבל מרות, כללים וחוקים"],
+                ["פִּיכָּה","התפרץ וזרם החוצה, נבע"],
+                ["פִּיזּוּר דַּעַת / נֶפֶשׁ","בלבול, חוסר ריכוז"],
+                ["פְּעָמָיו","צעדיו (פַּעַם = צעד = שַׁעַל)"],
+                ["פָּרָדוֹקְס","סתירה פנימית"],
+                ["פְּרִישׁוּת","התנזרות מתענוגות, חיי צניעות"],
+                ["פֶּרְמָנֶנְטִי","קבוע"],
+                ["פָּרַף","סגר באמצעות כפתורים או רוכסן"],
+                ["צָבָה","תפח, התנפח"],
+                ["פַּשְׁטָנִי","שטחי ולא מעמיק, רדוד"],
+                ["צֶדַע / צְדָעַיִים / צְדָעוֹת","רקה/רקות, כל אחד מצדי המצח ליד האוזן"],
+                ["צוֹנֵן","קריר, לא חם"],
+                ["צָלַח","הצליח","חצה תעלת מים או נהר"],
+                ["צְנִיפָה","צהלת הסוס"],
+                ["קָבַל","התלונן, רטן"],
+                ["קֳבָל עַם וְעֵדָה","בגלוי, לעיני כל"],
+                ["קוּנְדֵּסוּת","מעשה שובבות"],
+                ["קַל תְּפִיסָה","כינוי למי שמבין דברים במהירות"],
+                ["קַל דַּעַת","נמהר, פזיז"],
+                ["קִילּוּחַ","זרם דק, טפטוף"],
+                ["קָפַח","הכה, הלם (שמש קופחת - שמש מחממת מאוד, שמש \"מכה\")"],
+                ["קְרֵי","דהיינו, כלומר"],
+                ["קָרַם עוֹר וְגִידִים","החל להיעשות ממשי, התממש"],
+                ["קָשִׁישׁ","זקן מאוד, ישיש"],
+                ["רְבָבָה","עשרת אלפים"],
+                ["רָמָה / עָלְתָה קַרְנוֹ","נחל הצלחה וזכה לכבוד"],
+                ["רִיחֵף","ריחף, גלש"],
+                ["רִפְרֵף","בחן משהו באופן שטחי ומהיר מבלי להתעמק בו, העיף מבט"],
+                ["שְׁאֵר בָּשָׂר","קרוב, בן משפחה"],
+                ["שׁוּמָה","בליטה בגוף (דומה לנקודת חן גדולה)","הערכה, אומדן (פקיד שומה - פקיד מס)"],
+                ["שְׁכִיב מְרַע","חולה אנוש, גוסס"],
+                ["שָׂם נַפְשׁוֹ בְּכַפּוֹ","סיכן את עצמו"],
+                ["שָׁנוּן","חריף, פיקח","חד, מושחז"],
+                ["שָׁנַק / שִׁינֵּק","חנק"],
+                ["שִׁיעוּר","גודל, מידה"],
+                ["שָׁת","שם, הניח"],
+                ["שִׁיפּוּל","תחתית, החלק הנמוך (שיפולי ההרים - המדרונות התחתיים)"],
+                ["תִּמּוּכִין","גיבוי, חיפוי, מקור מוסמך כתוב, אסמכתא"],
+                ["תָּמִיר","גבוה, זקוף"],
+                ["תָּפֵל","חסר טעם עקב מחסור בתבלינים, סר טעם","סתמי, חסר משמעות"],
+                ["תַּעַר","סכין גילוח"],
+                ["תֶּקֶר","חור בצמיג הגורם לבריחת האוויר ממנו ולהשבתת הגלגל, פנצ'ר"]
+            ]
+        };
+
+        const unitsDict = {};
+        for (let u = 1; u <= 10; u++) {
+            unitsDict[u] = rawUnitsData[u].map((entry, idx) => ({
+                id: `${u}-${idx + 1}`,
+                unit: u,
+                term: entry[0],
+                meanings: entry.slice(1)
+            }));
+        }
+
+        const STORAGE_KEY = 'campus_il_psychometric_progress_v1';
+
+        const unitProgress = {};
+        for (let u = 1; u <= 10; u++) {
+            unitProgress[u] = {
+                masteredIds: new Set(),
+                missedPoolIds: [],
+                roundNumber: 1
+            };
+        }
+
+        function loadSavedProgress() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                for (let u = 1; u <= 10; u++) {
+                    if (parsed[u]) {
+                        unitProgress[u].masteredIds = new Set(parsed[u].masteredIds || []);
+                        unitProgress[u].missedPoolIds = parsed[u].missedPoolIds || [];
+                        unitProgress[u].roundNumber = parsed[u].roundNumber || 1;
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function saveProgress() {
+            try {
+                const serialized = {};
+                for (let u = 1; u <= 10; u++) {
+                    serialized[u] = {
+                        masteredIds: Array.from(unitProgress[u].masteredIds),
+                        missedPoolIds: unitProgress[u].missedPoolIds,
+                        roundNumber: unitProgress[u].roundNumber
+                    };
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
+            } catch (e) {}
+        }
 
         const state = {
-            roundNumber: 1,
+            currentUnit: 1,
             roundSize: 10,
             wordFilter: 'all',
             direction: 'term-to-def',
             showPolyHint: true,
-            masteredIds: new Set(),
-            missedPoolIds: [],
             currentRoundQueue: [],
             currentQueueIndex: 0,
             roundCorrectCount: 0,
@@ -492,6 +2149,8 @@
         };
 
         const els = {
+            unitSwitcherBar: document.getElementById('unit-switcher-bar'),
+            globalMasteryBadge: document.getElementById('global-mastery-badge'),
             roundTitle: document.getElementById('round-title'),
             filterSubtitle: document.getElementById('filter-subtitle'),
             seg0: document.getElementById('seg-0'),
@@ -524,6 +2183,7 @@
             openSettingsBtn: document.getElementById('open-settings-btn'),
             closeSettingsBtn: document.getElementById('close-settings-btn'),
             settingsModal: document.getElementById('settings-modal'),
+            settingsModalTitle: document.getElementById('settings-modal-title'),
             settingRoundSize: document.getElementById('setting-round-size'),
             settingWordFilter: document.getElementById('setting-word-filter'),
             settingDirection: document.getElementById('setting-direction'),
@@ -533,20 +2193,32 @@
             openOverviewBtn: document.getElementById('open-overview-btn'),
             closeOverviewBtn: document.getElementById('close-overview-btn'),
             overviewModal: document.getElementById('overview-modal'),
+            overviewModalTitle: document.getElementById('overview-modal-title'),
+            overviewModalSubtitle: document.getElementById('overview-modal-subtitle'),
+            overviewChartTitle: document.getElementById('overview-chart-title'),
             resumeStudyBtn: document.getElementById('resume-study-btn'),
             glossarySearchInput: document.getElementById('glossary-search-input'),
             glossaryTypeFilter: document.getElementById('glossary-type-filter'),
             glossaryItemsContainer: document.getElementById('glossary-items-container')
         };
 
-        function getFilteredPool() {
+        function getUnitWords(unitNum = state.currentUnit) {
+            return unitsDict[unitNum] || [];
+        }
+
+        function getUnitState(unitNum = state.currentUnit) {
+            return unitProgress[unitNum];
+        }
+
+        function getFilteredPool(unitNum = state.currentUnit) {
+            const words = getUnitWords(unitNum);
             if (state.wordFilter === 'poly') {
-                return unit1Words.filter(w => w.meanings.length > 1);
+                return words.filter(w => w.meanings.length > 1);
             }
             if (state.wordFilter === 'single') {
-                return unit1Words.filter(w => w.meanings.length === 1);
+                return words.filter(w => w.meanings.length === 1);
             }
-            return unit1Words;
+            return words;
         }
 
         function shuffleArray(arr) {
@@ -558,21 +2230,68 @@
             return copy;
         }
 
+        function renderUnitSwitcher() {
+            els.unitSwitcherBar.innerHTML = '';
+            let totalMasteredAllUnits = 0;
+            let totalWordsAllUnits = 0;
+
+            for (let u = 1; u <= 10; u++) {
+                const uWords = getUnitWords(u);
+                const uState = getUnitState(u);
+                const masteredCount = uState.masteredIds.size;
+                totalMasteredAllUnits += masteredCount;
+                totalWordsAllUnits += uWords.length;
+
+                const isCurrent = u === state.currentUnit;
+                const isCompleted = masteredCount > 0 && masteredCount >= uWords.length;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.title = `יחידה ${u} (${masteredCount}/${uWords.length} מילים)`;
+
+                if (isCurrent) {
+                    btn.className = 'rounded-lg py-1.5 px-1 text-center font-extrabold text-xs bg-[#4255FF] text-white border border-[#7382FF] shadow-md transition-all cursor-pointer';
+                } else if (isCompleted) {
+                    btn.className = 'rounded-lg py-1.5 px-1 text-center font-bold text-xs bg-[#18AE79]/20 text-[#18AE79] border border-[#18AE79]/50 hover:bg-[#18AE79]/30 transition-all cursor-pointer';
+                } else if (masteredCount > 0) {
+                    btn.className = 'rounded-lg py-1.5 px-1 text-center font-semibold text-xs bg-[#13113C] text-slate-200 border border-[#18AE79]/40 hover:border-[#4255FF] transition-all cursor-pointer';
+                } else {
+                    btn.className = 'rounded-lg py-1.5 px-1 text-center font-semibold text-xs bg-[#13113C] text-slate-300 border border-[#2E3856] hover:border-[#4255FF] hover:text-white transition-all cursor-pointer';
+                }
+
+                btn.innerHTML = `<span>יח׳ ${u}${isCompleted ? ' ✓' : ''}</span>`;
+                btn.addEventListener('click', () => switchUnit(u));
+                els.unitSwitcherBar.appendChild(btn);
+            }
+
+            els.globalMasteryBadge.textContent = `שליטה כוללת: ${totalMasteredAllUnits} / ${totalWordsAllUnits}`;
+        }
+
+        function switchUnit(unitNum) {
+            els.settingsModal.classList.add('hidden');
+            els.overviewModal.classList.add('hidden');
+
+            state.currentUnit = unitNum;
+            renderUnitSwitcher();
+            buildNextRound();
+        }
+
         function updateProgressUI() {
+            const uState = getUnitState();
             const pool = getFilteredPool();
             const total = pool.length;
-            const masteredInPool = pool.filter(w => state.masteredIds.has(w.id)).length;
+            const masteredInPool = pool.filter(w => uState.masteredIds.has(w.id)).length;
 
             els.masteredPill.textContent = masteredInPool;
             els.totalPill.textContent = total;
-            els.roundTitle.textContent = `יחידה 1 • סיבוב ${state.roundNumber}`;
+            els.roundTitle.textContent = `יחידה ${state.currentUnit} • סיבוב ${uState.roundNumber}`;
 
             if (state.wordFilter === 'poly') {
-                els.filterSubtitle.textContent = `מילים רב-משמעיות ביחידה 1 (${total})`;
+                els.filterSubtitle.textContent = `מילים רב-משמעיות ביחידה ${state.currentUnit} (${total})`;
             } else if (state.wordFilter === 'single') {
-                els.filterSubtitle.textContent = `מילים בעלות פירוש יחיד ביחידה 1 (${total})`;
+                els.filterSubtitle.textContent = `מילים בעלות פירוש יחיד ביחידה ${state.currentUnit} (${total})`;
             } else {
-                els.filterSubtitle.textContent = `כל מילות היחידה (${total})`;
+                els.filterSubtitle.textContent = `כל מילות יחידה ${state.currentUnit} (${total})`;
             }
 
             const pct = total > 0 ? (masteredInPool / total) * 100 : 0;
@@ -589,29 +2308,33 @@
                     seg.style.width = `${innerPct}%`;
                 }
             });
+
+            renderUnitSwitcher();
         }
 
         function buildNextRound() {
+            const uState = getUnitState();
             const pool = getFilteredPool();
-            const unmastered = pool.filter(w => !state.masteredIds.has(w.id));
+            const unmastered = pool.filter(w => !uState.masteredIds.has(w.id));
 
             if (unmastered.length === 0) {
-                state.masteredIds.clear();
-                state.missedPoolIds = [];
-                state.roundNumber = 1;
+                uState.masteredIds.clear();
+                uState.missedPoolIds = [];
+                uState.roundNumber = 1;
+                saveProgress();
                 return buildNextRound();
             }
 
-            const priorityItems = unmastered.filter(w => state.missedPoolIds.includes(w.id));
-            const freshItems = shuffleArray(unmastered.filter(w => !state.missedPoolIds.includes(w.id)));
+            const priorityItems = unmastered.filter(w => uState.missedPoolIds.includes(w.id));
+            const freshItems = shuffleArray(unmastered.filter(w => !uState.missedPoolIds.includes(w.id)));
 
             const combined = [...shuffleArray(priorityItems), ...freshItems];
-            const size = Math.min(state.roundSize, combined.length);
-            state.currentRoundQueue = combined.slice(0, size);
+            const effectiveSize = state.roundSize >= 999 ? combined.length : Math.min(state.roundSize, combined.length);
+            state.currentRoundQueue = combined.slice(0, effectiveSize);
             state.currentQueueIndex = 0;
             state.roundCorrectCount = 0;
             state.roundMissedItems = [];
-            state.missedPoolIds = [];
+            uState.missedPoolIds = [];
 
             updateProgressUI();
             showQuestionStage();
@@ -628,7 +2351,8 @@
             const chosenMeaningIdx = Math.floor(Math.random() * wordObj.meanings.length);
             const chosenMeaning = wordObj.meanings[chosenMeaningIdx];
 
-            const otherWords = shuffleArray(unit1Words.filter(w => w.id !== wordObj.id));
+            const unitWords = getUnitWords();
+            const otherWords = shuffleArray(unitWords.filter(w => w.id !== wordObj.id));
             const distractors = [];
 
             for (let i = 0; i < otherWords.length && distractors.length < 3; i++) {
@@ -670,7 +2394,9 @@
             els.questionStage.classList.add('fade-slide');
 
             const isTermToDef = state.direction === 'term-to-def';
-            els.questionDirectionBadge.textContent = isTermToDef ? 'מילה מתוך יחידה 1' : 'פירוש מתוך יחידה 1';
+            els.questionDirectionBadge.textContent = isTermToDef
+                ? `מילה מתוך יחידה ${state.currentUnit}`
+                : `פירוש מתוך יחידה ${state.currentUnit}`;
 
             if (state.showPolyHint && wordObj.meanings.length > 1) {
                 els.polysemyHintBadge.textContent = `רב-משמעי • ${wordObj.meanings.length} פירושים`;
@@ -706,6 +2432,7 @@
             if (state.isAnswered) return;
             state.isAnswered = true;
 
+            const uState = getUnitState();
             const q = state.currentQuestion;
             const selectedChoice = q.choices[selectedIdx];
             const buttons = els.optionsList.children;
@@ -730,12 +2457,12 @@
             });
 
             if (selectedChoice.isCorrect) {
-                state.masteredIds.add(q.word.id);
+                uState.masteredIds.add(q.word.id);
                 state.roundCorrectCount++;
                 els.feedbackStatusTitle.textContent = 'כל הכבוד! תשובה נכונה ✓';
                 els.feedbackStatusTitle.className = 'text-sm font-extrabold text-[#18AE79]';
             } else {
-                state.missedPoolIds.push(q.word.id);
+                uState.missedPoolIds.push(q.word.id);
                 if (!state.roundMissedItems.some(item => item.id === q.word.id)) {
                     state.roundMissedItems.push(q.word);
                 }
@@ -743,6 +2470,7 @@
                 els.feedbackStatusTitle.className = 'text-sm font-extrabold text-[#FF725B]';
             }
 
+            saveProgress();
             updateProgressUI();
 
             els.feedbackWordTag.textContent = q.word.meanings.length > 1
@@ -761,7 +2489,7 @@
             });
 
             if (state.currentQueueIndex === state.currentRoundQueue.length - 1) {
-                els.nextQuestionBtn.innerHTML = `<span>לסיכום סיבוב ${state.roundNumber}</span> <span>⬅</span>`;
+                els.nextQuestionBtn.innerHTML = `<span>לסיכום סיבוב ${uState.roundNumber}</span> <span>⬅</span>`;
             } else {
                 els.nextQuestionBtn.innerHTML = `<span>המשך לשאלה הבאה</span> <span>⬅</span>`;
             }
@@ -783,17 +2511,18 @@
             els.questionStage.classList.add('hidden');
             els.roundSummaryStage.classList.remove('hidden');
 
+            const uState = getUnitState();
             const pool = getFilteredPool();
-            const masteredInPool = pool.filter(w => state.masteredIds.has(w.id)).length;
+            const masteredInPool = pool.filter(w => uState.masteredIds.has(w.id)).length;
             const remainingUnmastered = pool.length - masteredInPool;
 
             els.summaryHeading.textContent = remainingUnmastered === 0
-                ? 'מדהים! השלמת את כל יחידה 1! 🏆'
-                : `סיימת את סיבוב ${state.roundNumber}!`;
+                ? `מדהים! השלמת את כל יחידה ${state.currentUnit}! 🏆`
+                : `סיימת את סיבוב ${uState.roundNumber} ביחידה ${state.currentUnit}!`;
 
             els.summarySubtext.textContent = remainingUnmastered === 0
-                ? 'שלטת בכל מילות היחידה. תוכל להתחיל את היחידה מחדש או לשנות סינון בהגדרות.'
-                : `נותרו עוד ${remainingUnmastered} מילים להשלמת השליטה המלאה ביחידה 1.`;
+                ? `שלטת בכל מילות יחידה ${state.currentUnit}. תוכל לעבור ליחידה הבאה בסרגל העליון או לתרגל שוב.`
+                : `נותרו עוד ${remainingUnmastered} מילים להשלמת השליטה המלאה ביחידה ${state.currentUnit}.`;
 
             els.sumRoundCorrect.textContent = state.roundCorrectCount;
             els.sumRoundMissed.textContent = state.roundMissedItems.length;
@@ -813,19 +2542,21 @@
             }
 
             if (remainingUnmastered === 0) {
-                els.continueNextRoundBtn.textContent = 'תרגול חוזר על כל יחידה 1 🔄';
+                els.continueNextRoundBtn.textContent = `תרגול חוזר על כל יחידה ${state.currentUnit} 🔄`;
             } else {
-                els.continueNextRoundBtn.textContent = `המשך לסיבוב ${state.roundNumber + 1} ⬅`;
+                els.continueNextRoundBtn.textContent = `המשך לסיבוב ${uState.roundNumber + 1} ⬅`;
             }
         }
 
         function renderOverviewChart() {
-            const canvas = document.getElementById('unit1-chart');
+            const canvas = document.getElementById('unit-chart');
             const ctx = canvas.getContext('2d');
+            const uState = getUnitState();
+            const unitWords = getUnitWords();
 
-            const masteredCount = state.masteredIds.size;
-            const multiUnmastered = unit1Words.filter(w => !state.masteredIds.has(w.id) && w.meanings.length > 1).length;
-            const singleUnmastered = unit1Words.filter(w => !state.masteredIds.has(w.id) && w.meanings.length === 1).length;
+            const masteredCount = uState.masteredIds.size;
+            const multiUnmastered = unitWords.filter(w => !uState.masteredIds.has(w.id) && w.meanings.length > 1).length;
+            const singleUnmastered = unitWords.filter(w => !uState.masteredIds.has(w.id) && w.meanings.length === 1).length;
 
             if (state.chartInstance) {
                 state.chartInstance.destroy();
@@ -865,11 +2596,13 @@
         function renderGlossaryList() {
             const query = els.glossarySearchInput.value.trim();
             const typeFilter = els.glossaryTypeFilter.value;
+            const uState = getUnitState();
+            const unitWords = getUnitWords();
 
-            const filtered = unit1Words.filter(w => {
+            const filtered = unitWords.filter(w => {
                 if (typeFilter === 'poly' && w.meanings.length < 2) return false;
-                if (typeFilter === 'mastered' && !state.masteredIds.has(w.id)) return false;
-                if (typeFilter === 'unmastered' && state.masteredIds.has(w.id)) return false;
+                if (typeFilter === 'mastered' && !uState.masteredIds.has(w.id)) return false;
+                if (typeFilter === 'unmastered' && uState.masteredIds.has(w.id)) return false;
 
                 if (query.length > 0) {
                     const plainTerm = w.term.replace(/[\u0591-\u05C7]/g, '');
@@ -888,7 +2621,7 @@
             }
 
             filtered.forEach(w => {
-                const isMastered = state.masteredIds.has(w.id);
+                const isMastered = uState.masteredIds.has(w.id);
                 const card = document.createElement('div');
                 card.className = 'rounded-xl bg-[#0A092D] border border-[#2E3856] p-3 flex items-start justify-between gap-3';
                 const polyBadge = w.meanings.length > 1
@@ -912,18 +2645,23 @@
         els.nextQuestionBtn.addEventListener('click', advanceQuestion);
 
         els.continueNextRoundBtn.addEventListener('click', () => {
-            state.roundNumber++;
+            const uState = getUnitState();
+            uState.roundNumber++;
+            saveProgress();
             buildNextRound();
         });
 
         els.restartUnitBtn.addEventListener('click', () => {
-            state.masteredIds.clear();
-            state.missedPoolIds = [];
-            state.roundNumber = 1;
+            const uState = getUnitState();
+            uState.masteredIds.clear();
+            uState.missedPoolIds = [];
+            uState.roundNumber = 1;
+            saveProgress();
             buildNextRound();
         });
 
         els.openSettingsBtn.addEventListener('click', () => {
+            els.settingsModalTitle.textContent = `הגדרות תרגול — יחידה ${state.currentUnit}`;
             els.settingsModal.classList.remove('hidden');
         });
         els.closeSettingsBtn.addEventListener('click', () => {
@@ -934,19 +2672,28 @@
             state.wordFilter = els.settingWordFilter.value;
             state.direction = els.settingDirection.value;
             state.showPolyHint = els.settingShowPolyHint.checked;
-            state.roundNumber = 1;
+            getUnitState().roundNumber = 1;
+            saveProgress();
             els.settingsModal.classList.add('hidden');
             buildNextRound();
         });
         els.resetProgressSettingsBtn.addEventListener('click', () => {
-            state.masteredIds.clear();
-            state.missedPoolIds = [];
-            state.roundNumber = 1;
+            const uState = getUnitState();
+            uState.masteredIds.clear();
+            uState.missedPoolIds = [];
+            uState.roundNumber = 1;
+            saveProgress();
             els.settingsModal.classList.add('hidden');
             buildNextRound();
         });
 
         els.openOverviewBtn.addEventListener('click', () => {
+            const unitWords = getUnitWords();
+            els.overviewModalTitle.textContent = `יחידה ${state.currentUnit} — מילון מלא ומעקב שליטה`;
+            els.overviewModalSubtitle.textContent = `כולל כל ${unitWords.length} הערכים ביחידה ${state.currentUnit} מתוך קובץ קמפוס IL`;
+            els.overviewChartTitle.textContent = `התפלגות שליטה במילות יחידה ${state.currentUnit}`;
+            els.glossarySearchInput.value = '';
+            els.glossaryTypeFilter.value = 'all';
             els.overviewModal.classList.remove('hidden');
             renderOverviewChart();
             renderGlossaryList();
@@ -979,6 +2726,8 @@
         });
 
         window.addEventListener('DOMContentLoaded', () => {
+            loadSavedProgress();
+            renderUnitSwitcher();
             buildNextRound();
         });
     </script>
